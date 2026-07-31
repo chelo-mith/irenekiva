@@ -2,7 +2,7 @@
 // Configuration FedaPay - Ce fichier ne s'exécute QUE côté serveur
 // En production, changez juste FEDAPAY_ENV en 'live' et les clés
 
-import { FedaPay } from "fedapay";
+import { FedaPay } from "@/integrations/fedapay/sdk.server";
 
 function initFedaPay() {
   const secretKey = process.env.FEDAPAY_SECRET_KEY;

@@ -2,7 +2,7 @@
 // Logique métier pour les paiements FedaPay
 // Ce fichier ne s'exécute QUE côté serveur
 
-import { Transaction, Customer } from "fedapay";
+import { Transaction, Customer } from "@/integrations/fedapay/sdk.server";
 import { getFedaPay, getAppUrl } from "@/integrations/fedapay/server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import type { Database } from "@/integrations/supabase/types";

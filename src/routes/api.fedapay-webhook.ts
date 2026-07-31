@@ -3,7 +3,7 @@
 // Ce endpoint est appelé par FedaPay (pas par le navigateur)
 
 import { createFileRoute } from "@tanstack/react-router";
-import { Webhook } from "fedapay";
+import { Webhook } from "@/integrations/fedapay/sdk.server";
 import { getFedaPayWebhookSecret } from "@/integrations/fedapay/server";
 import { updatePaymentStatus, verifyFedaPayTransaction } from "@/server/payments.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";

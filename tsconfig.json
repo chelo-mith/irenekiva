@@ -1,5 +1,6 @@
 {
   "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts", "eslint.config.js"],
+  "exclude": ["node_modules", "dist", ".netlify"],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",
@@ -11,6 +12,7 @@
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": false,
     "noEmit": true,
+    "ignoreDeprecations": "6.0",
     /* Linting */
     "skipLibCheck": true,
     "strict": true,

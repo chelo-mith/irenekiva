@@ -7,14 +7,34 @@ type FedaPayClient = {
   setEnvironment: (env: "sandbox" | "live") => void;
 };
 
+type FedaPayCustomer = {
+  id: number;
+  firstname?: string;
+  lastname?: string;
+  email?: string;
+  phone_number?: unknown;
+};
+
+type FedaPayTokenResult = {
+  url?: string | null;
+};
+
+type FedaPayTransaction = {
+  id: number;
+  status?: string;
+  amount?: number;
+  reference?: string | null;
+  generateToken: () => Promise<FedaPayTokenResult>;
+};
+
 type FedaPayModule = {
   FedaPay: FedaPayClient;
   Transaction: {
-    create: (...args: unknown[]) => Promise<unknown>;
-    retrieve: (...args: unknown[]) => Promise<unknown>;
+    create: (data: Record<string, unknown>) => Promise<FedaPayTransaction>;
+    retrieve: (id: string | number) => Promise<FedaPayTransaction>;
   };
   Customer: {
-    create: (...args: unknown[]) => Promise<unknown>;
+    create: (data: Record<string, unknown>) => Promise<FedaPayCustomer>;
   };
   Webhook: {
     constructEvent: (...args: unknown[]) => unknown;
@@ -36,12 +56,12 @@ export const FedaPay: FedaPayClient = {
 };
 
 export const Transaction = {
-  create: (...args: unknown[]) => getFedapayModule().Transaction.create(...args),
-  retrieve: (...args: unknown[]) => getFedapayModule().Transaction.retrieve(...args),
+  create: (data: Record<string, unknown>) => getFedapayModule().Transaction.create(data),
+  retrieve: (id: string | number) => getFedapayModule().Transaction.retrieve(id),
 };
 
 export const Customer = {
-  create: (...args: unknown[]) => getFedapayModule().Customer.create(...args),
+  create: (data: Record<string, unknown>) => getFedapayModule().Customer.create(data),
 };
 
 export const Webhook = {

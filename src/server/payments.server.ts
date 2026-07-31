@@ -200,8 +200,8 @@ export async function verifyFedaPayTransaction(transactionId: string): Promise<{
 
     const transaction = await Transaction.retrieve(transactionId);
     return {
-      status: transaction.status,
-      amount: transaction.amount,
+      status: transaction.status || "unknown",
+      amount: transaction.amount ?? 0,
       reference: transaction.reference || "",
     };
   } catch (err) {

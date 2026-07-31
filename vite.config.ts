@@ -1,5 +1,6 @@
-import { defineConfig } from "@lovable.dev/vite-tanstack-config";
-import { loadEnv } from "vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig, loadEnv } from "vite";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig(async ({ mode }) => {
   const { nitro } = await import("nitro/vite");
@@ -14,14 +15,13 @@ export default defineConfig(async ({ mode }) => {
   return {
     cloudflare: false,
     plugins: [
+      react(),
+      tsconfigPaths(),
       nitro({
         preset: "netlify",
         serverDir: "src/server",
       }),
     ],
-    tanstackStart: {
-      server: { entry: "server" },
-    },
     // 🚨 FORCE VITE À BUNDLER FEDAPAY ET AXIOS 🚨
     // Cela empêche Vite de séparer axios de son adaptateur Node.js
     ssr: {

@@ -245,7 +245,7 @@ function SignupPage() {
 
   return (
     <AuthShell
-      title="Créer un compte."
+      title="Créer un compte ❤️❤️❤️."
       subtitle="Quelques secondes pour rejoindre KIVA."
       footer={
         <span>

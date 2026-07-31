@@ -18,7 +18,7 @@ export default defineConfig(async ({ mode }) => {
       react(),
       tsconfigPaths(),
       nitro({
-        preset: "netlify",
+        preset: "vercel",
         serverDir: "src/server",
       }),
     ],

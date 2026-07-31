@@ -19,7 +19,7 @@ export default async function (event: H3Event) {
 
     const { email, token, firstName } = body;
 
-    const appUrl = process.env.APP_URL ?? "https://irenekiva.netlify.app";
+    const appUrl = process.env.APP_URL ?? "https://irenekiva-delta.vercel.app";
 
     await sendVerificationEmail({
       email,

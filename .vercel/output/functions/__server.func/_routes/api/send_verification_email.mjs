@@ -18,13 +18,7 @@ import "child_process";
 import "../../_libs/rou3.mjs";
 import "../../_libs/srvx.mjs";
 import "node:stream";
-async function sendVerificationEmail$1({
-  email,
-  token,
-  firstName,
-  appUrl,
-  from
-}) {
+async function sendVerificationEmail$1({ email, token, firstName, appUrl, from }) {
   const smtpHost = process.env.SMTP_HOST;
   const smtpPort = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 587;
   const smtpSecure = process.env.SMTP_SECURE === "true";
@@ -40,8 +34,8 @@ async function sendVerificationEmail$1({
     secure: smtpSecure,
     auth: {
       user: smtpUser,
-      pass: smtpPass
-    }
+      pass: smtpPass,
+    },
   });
   const verificationUrl = `${appUrl.replace(/\/$/, "")}/verify-email?token=${encodeURIComponent(token)}`;
   const html = `
@@ -62,7 +56,7 @@ async function sendVerificationEmail$1({
     from: from ?? defaultFrom,
     to: email,
     subject: "Vérifiez votre adresse email - KIVA",
-    html
+    html,
   });
   return info;
 }
@@ -72,30 +66,28 @@ async function sendVerificationEmail(event) {
     if (!body) {
       return new Response(JSON.stringify({ error: "Body manquant" }), {
         status: 400,
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
       });
     }
     const { email, token, firstName } = body;
-    const appUrl = process.env.APP_URL ?? "https://irenekiva.netlify.app";
+    const appUrl = process.env.APP_URL ?? "https://irenekiva-delta.vercel.app";
     await sendVerificationEmail$1({
       email,
       token,
       firstName: firstName ?? "",
-      appUrl
+      appUrl,
     });
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
     console.error("Error in /api/send-verification-email:", err);
     const errorMessage = err instanceof Error ? err.message : String(err);
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   }
 }
-export {
-  sendVerificationEmail as default
-};
+export { sendVerificationEmail as default };

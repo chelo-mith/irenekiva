@@ -7,7 +7,10 @@ const services = {};
 globalThis.__nitro_vite_envs__ = services;
 const errorHandler$1 = (error, event) => {
   const res = defaultHandler(error, event);
-  return new NodeResponse(typeof res.body === "string" ? res.body : JSON.stringify(res.body, null, 2), res);
+  return new NodeResponse(
+    typeof res.body === "string" ? res.body : JSON.stringify(res.body, null, 2),
+    res,
+  );
 };
 function defaultHandler(error, event) {
   const unhandled = error.unhandled ?? !HTTPError.isError(error);
@@ -18,28 +21,32 @@ function defaultHandler(error, event) {
     if (/^\/[^/]/.test(baseURL) && !url.pathname.startsWith(baseURL)) {
       return {
         status: 302,
-        headers: new Headers({ location: `${baseURL}${url.pathname.slice(1)}${url.search}` })
+        headers: new Headers({ location: `${baseURL}${url.pathname.slice(1)}${url.search}` }),
       };
     }
   }
   const headers = new Headers(unhandled ? {} : error.headers);
   headers.set("content-type", "application/json; charset=utf-8");
-  const jsonBody = unhandled ? {
-    status,
-    unhandled: true
-  } : typeof error.toJSON === "function" ? error.toJSON() : {
-    status,
-    statusText,
-    message: error.message
-  };
+  const jsonBody = unhandled
+    ? {
+        status,
+        unhandled: true,
+      }
+    : typeof error.toJSON === "function"
+      ? error.toJSON()
+      : {
+          status,
+          statusText,
+          message: error.message,
+        };
   return {
     status,
     statusText,
     headers,
     body: {
       error: true,
-      ...jsonBody
-    }
+      ...jsonBody,
+    },
   };
 }
 const errorHandlers = [errorHandler$1];
@@ -58,7 +65,9 @@ async function errorHandler(error, event) {
 const findRouteRules = (m, p) => {
   return [];
 };
-const _lazy_bHNnRS = defineLazyEventHandler(() => import("./_routes/api/send_verification_email.mjs"));
+const _lazy_bHNnRS = defineLazyEventHandler(
+  () => import("./_routes/api/send_verification_email.mjs"),
+);
 const findRoute = /* @__PURE__ */ (() => {
   const $0 = { route: "/api/send-verification-email", handler: _lazy_bHNnRS };
   return (m, p) => {
@@ -87,14 +96,16 @@ function createNitroApp() {
       if (errors) {
         errors.push({
           error,
-          context: errorCtx
+          context: errorCtx,
         });
       }
     }
   };
-  const h3App = createH3App({ onError(error, event) {
-    return errorHandler(error, event);
-  } });
+  const h3App = createH3App({
+    onError(error, event) {
+      return errorHandler(error, event);
+    },
+  });
   let appHandler = (req) => {
     req.context ||= {};
     req.context.nitro = req.context.nitro || { errors: [] };
@@ -104,7 +115,7 @@ function createNitroApp() {
     fetch: appHandler,
     h3: h3App,
     hooks,
-    captureError
+    captureError,
   };
   return app;
 }
@@ -130,7 +141,7 @@ function getRouteRules(method, pathname) {
         if (typeof currentRule.options === "object" && typeof rule.options === "object") {
           currentRule.options = {
             ...currentRule.options,
-            ...rule.options
+            ...rule.options,
           };
         } else {
           currentRule.options = rule.options;
@@ -138,18 +149,20 @@ function getRouteRules(method, pathname) {
         currentRule.route = rule.route;
         currentRule.params = {
           ...currentRule.params,
-          ...layer.params
+          ...layer.params,
         };
       } else if (rule.options !== false) {
         routeRules[rule.name] = {
           ...rule,
-          params: layer.params
+          params: layer.params,
         };
       }
     }
   }
   const middleware = [];
-  const orderedRules = Object.values(routeRules).sort((a, b) => (a.handler?.order || 0) - (b.handler?.order || 0));
+  const orderedRules = Object.values(routeRules).sort(
+    (a, b) => (a.handler?.order || 0) - (b.handler?.order || 0),
+  );
   for (const rule of orderedRules) {
     if (rule.options === false || !rule.handler) {
       continue;
@@ -158,7 +171,7 @@ function getRouteRules(method, pathname) {
   }
   return {
     routeRules,
-    routeRuleMiddleware: middleware
+    routeRuleMiddleware: middleware,
   };
 }
 const ISR_URL_PARAM = "__isr_route";
@@ -181,24 +194,29 @@ function isrRouteRewrite(reqUrl, xNowRouteMatches) {
   }
 }
 const nitroApp = useNitroApp();
-const vercel_web = { fetch(req, context) {
-  const isrURL = isrRouteRewrite(req.url, req.headers.get("x-now-route-matches"));
-  if (isrURL) {
-    const { routeRules } = getRouteRules("", isrURL[0]);
-    if (routeRules?.isr) {
-      req = new Request(new URL(isrURL[0] + (isrURL[1] ? `?${isrURL[1]}` : ""), req.url).href, req);
+const vercel_web = {
+  fetch(req, context) {
+    const isrURL = isrRouteRewrite(req.url, req.headers.get("x-now-route-matches"));
+    if (isrURL) {
+      const { routeRules } = getRouteRules("", isrURL[0]);
+      if (routeRules?.isr) {
+        req = new Request(
+          new URL(isrURL[0] + (isrURL[1] ? `?${isrURL[1]}` : ""), req.url).href,
+          req,
+        );
+      }
     }
-  }
-  req.runtime ??= { name: "vercel" };
-  req.runtime.vercel = { context };
-  let ip;
-  Object.defineProperty(req, "ip", { get() {
-    const h = req.headers.get("x-forwarded-for");
-    return ip ??= h?.split(",").shift()?.trim();
-  } });
-  req.waitUntil = context?.waitUntil;
-  return nitroApp.fetch(req);
-} };
-export {
-  vercel_web as default
+    req.runtime ??= { name: "vercel" };
+    req.runtime.vercel = { context };
+    let ip;
+    Object.defineProperty(req, "ip", {
+      get() {
+        const h = req.headers.get("x-forwarded-for");
+        return (ip ??= h?.split(",").shift()?.trim());
+      },
+    });
+    req.waitUntil = context?.waitUntil;
+    return nitroApp.fetch(req);
+  },
 };
+export { vercel_web as default };

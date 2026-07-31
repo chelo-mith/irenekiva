@@ -57,7 +57,10 @@ function requireCookies() {
         cookie.path = this.getPath(urlparts.pathname);
       }
       if (!cookie.expires) {
-        cookie.expires = new Date(Date.now() + (Number(this.options.sessionTimeout || SESSION_TIMEOUT) || SESSION_TIMEOUT) * 1e3);
+        cookie.expires = new Date(
+          Date.now() +
+            (Number(this.options.sessionTimeout || SESSION_TIMEOUT) || SESSION_TIMEOUT) * 1e3,
+        );
       }
       return this.add(cookie);
     }
@@ -68,7 +71,9 @@ function requireCookies() {
      * @returns {String} Cookie header or empty string if no matches were found
      */
     get(url) {
-      return this.list(url).map((cookie) => cookie.name + "=" + cookie.value).join("; ");
+      return this.list(url)
+        .map((cookie) => cookie.name + "=" + cookie.value)
+        .join("; ");
     }
     /**
      * Lists all valied cookie objects for the specified URL
@@ -98,47 +103,50 @@ function requireCookies() {
      */
     parse(cookieStr) {
       const cookie = {};
-      (cookieStr || "").toString().split(";").forEach((cookiePart) => {
-        const valueParts = cookiePart.split("=");
-        const key = valueParts.shift().trim().toLowerCase();
-        let value = valueParts.join("=").trim();
-        let domain;
-        if (!key) {
-          return;
-        }
-        switch (key) {
-          case "expires":
-            value = new Date(value);
-            if (value.toString() !== "Invalid Date") {
-              cookie.expires = value;
-            }
-            break;
-          case "path":
-            cookie.path = value;
-            break;
-          case "domain":
-            domain = value.toLowerCase();
-            if (domain.length && domain.charAt(0) !== ".") {
-              domain = "." + domain;
-            }
-            cookie.domain = domain;
-            break;
-          case "max-age":
-            cookie.expires = new Date(Date.now() + (Number(value) || 0) * 1e3);
-            break;
-          case "secure":
-            cookie.secure = true;
-            break;
-          case "httponly":
-            cookie.httponly = true;
-            break;
-          default:
-            if (!cookie.name) {
-              cookie.name = key;
-              cookie.value = value;
-            }
-        }
-      });
+      (cookieStr || "")
+        .toString()
+        .split(";")
+        .forEach((cookiePart) => {
+          const valueParts = cookiePart.split("=");
+          const key = valueParts.shift().trim().toLowerCase();
+          let value = valueParts.join("=").trim();
+          let domain;
+          if (!key) {
+            return;
+          }
+          switch (key) {
+            case "expires":
+              value = new Date(value);
+              if (value.toString() !== "Invalid Date") {
+                cookie.expires = value;
+              }
+              break;
+            case "path":
+              cookie.path = value;
+              break;
+            case "domain":
+              domain = value.toLowerCase();
+              if (domain.length && domain.charAt(0) !== ".") {
+                domain = "." + domain;
+              }
+              cookie.domain = domain;
+              break;
+            case "max-age":
+              cookie.expires = new Date(Date.now() + (Number(value) || 0) * 1e3);
+              break;
+            case "secure":
+              cookie.secure = true;
+              break;
+            case "httponly":
+              cookie.httponly = true;
+              break;
+            default:
+              if (!cookie.name) {
+                cookie.name = key;
+                cookie.value = value;
+              }
+          }
+        });
       return cookie;
     }
     /**
@@ -150,7 +158,11 @@ function requireCookies() {
      */
     match(cookie, url) {
       const urlparts = urllib.parse(url || "");
-      if (urlparts.hostname !== cookie.domain && (cookie.domain.charAt(0) !== "." || ("." + urlparts.hostname).substr(-cookie.domain.length) !== cookie.domain)) {
+      if (
+        urlparts.hostname !== cookie.domain &&
+        (cookie.domain.charAt(0) !== "." ||
+          ("." + urlparts.hostname).substr(-cookie.domain.length) !== cookie.domain)
+      ) {
         return false;
       }
       const path = this.getPath(urlparts.pathname);
@@ -194,7 +206,13 @@ function requireCookies() {
      * @returns {Boolean} True, if the cookies are the same
      */
     compare(a, b) {
-      return a.name === b.name && a.path === b.path && a.domain === b.domain && a.secure === b.secure && a.httponly === b.httponly;
+      return (
+        a.name === b.name &&
+        a.path === b.path &&
+        a.domain === b.domain &&
+        a.secure === b.secure &&
+        a.httponly === b.httponly
+      );
     }
     /**
      * Checks if a cookie is expired
@@ -203,7 +221,7 @@ function requireCookies() {
      * @returns {Boolean} True, if the cookie is expired
      */
     isExpired(cookie) {
-      return cookie.expires && cookie.expires < /* @__PURE__ */ new Date() || !cookie.value;
+      return (cookie.expires && cookie.expires < /* @__PURE__ */ new Date()) || !cookie.value;
     }
     /**
      * Returns normalized cookie path for an URL path argument
@@ -233,14 +251,14 @@ const homepage = "https://nodemailer.com/";
 const require$$10 = {
   name,
   version,
-  homepage
+  homepage,
 };
 var errors = { exports: {} };
 var hasRequiredErrors;
 function requireErrors() {
   if (hasRequiredErrors) return errors.exports;
   hasRequiredErrors = 1;
-  (function(module) {
+  (function (module) {
     const ERROR_CODES = {
       // Connection errors
       ECONNECTION: "Connection closed unexpectedly",
@@ -269,7 +287,7 @@ function requireErrors() {
       EPROXY: "Proxy connection error",
       EFILEACCESS: "File access rejected (disableFileAccess is set)",
       EURLACCESS: "URL access rejected (disableUrlAccess is set)",
-      EFETCH: "HTTP fetch error"
+      EFETCH: "HTTP fetch error",
     };
     module.exports = { ERROR_CODES };
     for (const code of Object.keys(ERROR_CODES)) {
@@ -292,7 +310,7 @@ function requireFetch() {
   const net = require$$7;
   const errors2 = requireErrors();
   const MAX_REDIRECTS = 5;
-  fetch.exports = function(url, options) {
+  fetch.exports = function (url, options) {
     return nmfetch(url, options);
   };
   fetch.exports.Cookies = Cookies;
@@ -317,7 +335,7 @@ function requireFetch() {
     const handler = parsed.protocol === "https:" ? https : http;
     const headers = {
       "accept-encoding": "gzip,deflate",
-      "user-agent": "nodemailer/" + packageData.version
+      "user-agent": "nodemailer/" + packageData.version,
     };
     Object.keys(options.headers || {}).forEach((key) => {
       headers[key.toLowerCase().trim()] = options.headers[key];
@@ -328,7 +346,7 @@ function requireFetch() {
     if (parsed.auth) {
       headers.Authorization = "Basic " + Buffer.from(parsed.auth).toString("base64");
     }
-    if (cookies2 = options.cookies.get(url)) {
+    if ((cookies2 = options.cookies.get(url))) {
       headers.cookie = cookies2;
     }
     if (options.body) {
@@ -353,10 +371,12 @@ function requireFetch() {
         } else if (typeof options.body === "object") {
           try {
             body = Buffer.from(
-              Object.keys(options.body).map((key) => {
-                const value = options.body[key].toString().trim();
-                return encodeURIComponent(key) + "=" + encodeURIComponent(value);
-              }).join("&")
+              Object.keys(options.body)
+                .map((key) => {
+                  const value = options.body[key].toString().trim();
+                  return encodeURIComponent(key) + "=" + encodeURIComponent(value);
+                })
+                .join("&"),
             );
           } catch (E) {
             if (finished) {
@@ -384,12 +404,18 @@ function requireFetch() {
       port: parsed.port ? parsed.port : parsed.protocol === "https:" ? 443 : 80,
       headers,
       rejectUnauthorized: false,
-      agent: false
+      agent: false,
     };
     if (options.tls) {
       Object.assign(reqOptions, options.tls);
     }
-    if (parsed.protocol === "https:" && parsed.hostname && parsed.hostname !== reqOptions.host && !net.isIP(parsed.hostname) && !reqOptions.servername) {
+    if (
+      parsed.protocol === "https:" &&
+      parsed.hostname &&
+      parsed.hostname !== reqOptions.host &&
+      !net.isIP(parsed.hostname) &&
+      !reqOptions.servername
+    ) {
       reqOptions.servername = parsed.hostname;
     }
     try {
@@ -518,7 +544,7 @@ var hasRequiredShared;
 function requireShared() {
   if (hasRequiredShared) return shared.exports;
   hasRequiredShared = 1;
-  (function(module) {
+  (function (module) {
     const urllib = require$$0$1;
     const util = require$$1$1;
     const fs = require$$2;
@@ -538,15 +564,18 @@ function requireShared() {
     let networkInterfaces;
     try {
       networkInterfaces = os.networkInterfaces();
-    } catch (_err) {
-    }
+    } catch (_err) {}
     module.exports.networkInterfaces = networkInterfaces;
     const isFamilySupported = (family, allowInternal) => {
       const ifaces = module.exports.networkInterfaces;
       if (!ifaces) {
         return true;
       }
-      return Object.keys(ifaces).map((key) => ifaces[key]).reduce((acc, val) => acc.concat(val), []).filter((i) => !i.internal || allowInternal).some((i) => i.family === "IPv" + family || i.family === family);
+      return Object.keys(ifaces)
+        .map((key) => ifaces[key])
+        .reduce((acc, val) => acc.concat(val), [])
+        .filter((i) => !i.internal || allowInternal)
+        .some((i) => i.family === "IPv" + family || i.family === family);
     };
     const resolve = (family, hostname, options, callback) => {
       options = options || {};
@@ -571,21 +600,22 @@ function requireShared() {
         return callback(null, Array.isArray(addresses) ? addresses : [].concat(addresses || []));
       });
     };
-    const dnsCache = module.exports.dnsCache = /* @__PURE__ */ new Map();
+    const dnsCache = (module.exports.dnsCache = /* @__PURE__ */ new Map());
     const formatDNSValue = (value, extra) => {
       if (!value) {
         return Object.assign({}, extra || {});
       }
       const addresses = value.addresses || [];
-      const host = addresses.length > 0 ? addresses[Math.floor(Math.random() * addresses.length)] : null;
+      const host =
+        addresses.length > 0 ? addresses[Math.floor(Math.random() * addresses.length)] : null;
       return Object.assign(
         {
           servername: value.servername,
           host,
           // Include all addresses for connection fallback support
-          _addresses: addresses
+          _addresses: addresses,
         },
-        extra || {}
+        extra || {},
       );
     };
     module.exports.resolveHostname = (options, callback) => {
@@ -596,13 +626,13 @@ function requireShared() {
       if (!options.host || net.isIP(options.host)) {
         const value = {
           addresses: [options.host],
-          servername: options.servername || false
+          servername: options.servername || false,
         };
         return callback(
           null,
           formatDNSValue(value, {
-            cached: false
-          })
+            cached: false,
+          }),
         );
       }
       let cached;
@@ -626,8 +656,8 @@ function requireShared() {
           return callback(
             null,
             formatDNSValue(cached.value, {
-              cached: true
-            })
+              cached: true,
+            }),
           );
         }
       }
@@ -651,31 +681,31 @@ function requireShared() {
           if (allAddresses.length) {
             const value = {
               addresses: allAddresses,
-              servername: options.servername || options.host
+              servername: options.servername || options.host,
             };
             dnsCache.set(options.host, {
               value,
-              expires: Date.now() + (options.dnsTtl || DNS_TTL)
+              expires: Date.now() + (options.dnsTtl || DNS_TTL),
             });
             return callback(
               null,
               formatDNSValue(value, {
-                cached: false
-              })
+                cached: false,
+              }),
             );
           }
           if (ipv4Error && ipv6Error) {
             if (cached) {
               dnsCache.set(options.host, {
                 value: cached.value,
-                expires: Date.now() + (options.dnsTtl || DNS_TTL)
+                expires: Date.now() + (options.dnsTtl || DNS_TTL),
               });
               return callback(
                 null,
                 formatDNSValue(cached.value, {
                   cached: true,
-                  error: ipv4Error
-                })
+                  error: ipv4Error,
+                }),
               );
             }
           }
@@ -685,57 +715,63 @@ function requireShared() {
                 if (cached) {
                   dnsCache.set(options.host, {
                     value: cached.value,
-                    expires: Date.now() + (options.dnsTtl || DNS_TTL)
+                    expires: Date.now() + (options.dnsTtl || DNS_TTL),
                   });
                   return callback(
                     null,
                     formatDNSValue(cached.value, {
                       cached: true,
-                      error: err3
-                    })
+                      error: err3,
+                    }),
                   );
                 }
                 return callback(err3);
               }
-              const supportedAddresses = addresses3 ? addresses3.filter((addr) => isFamilySupported(addr.family)).map((addr) => addr.address) : [];
+              const supportedAddresses = addresses3
+                ? addresses3
+                    .filter((addr) => isFamilySupported(addr.family))
+                    .map((addr) => addr.address)
+                : [];
               if (addresses3 && addresses3.length && !supportedAddresses.length) {
-                console.warn(`Failed to resolve IPv${addresses3[0].family} addresses with current network`);
+                console.warn(
+                  `Failed to resolve IPv${addresses3[0].family} addresses with current network`,
+                );
               }
               if (!supportedAddresses.length && cached) {
                 return callback(
                   null,
                   formatDNSValue(cached.value, {
-                    cached: true
-                  })
+                    cached: true,
+                  }),
                 );
               }
               const value = {
                 addresses: supportedAddresses.length ? supportedAddresses : [options.host],
-                servername: options.servername || options.host
+                servername: options.servername || options.host,
               };
               dnsCache.set(options.host, {
                 value,
-                expires: Date.now() + (options.dnsTtl || DNS_TTL)
+                expires: Date.now() + (options.dnsTtl || DNS_TTL),
               });
               return callback(
                 null,
                 formatDNSValue(value, {
-                  cached: false
-                })
+                  cached: false,
+                }),
               );
             });
           } catch (lookupErr) {
             if (cached) {
               dnsCache.set(options.host, {
                 value: cached.value,
-                expires: Date.now() + (options.dnsTtl || DNS_TTL)
+                expires: Date.now() + (options.dnsTtl || DNS_TTL),
               });
               return callback(
                 null,
                 formatDNSValue(cached.value, {
                   cached: true,
-                  error: lookupErr
-                })
+                  error: lookupErr,
+                }),
               );
             }
             return callback(ipv4Error || ipv6Error || lookupErr);
@@ -768,7 +804,7 @@ function requireShared() {
         const auth = url.auth.split(":");
         options.auth = {
           user: auth.shift(),
-          pass: auth.join(":")
+          pass: auth.join(":"),
         };
       }
       Object.keys(url.query || {}).forEach((key) => {
@@ -806,7 +842,9 @@ function requireShared() {
       delete entry.level;
       let logLevel = level;
       if (typeof logger[logLevel] !== "function") {
-        logLevel = ["info", "debug", "log", "trace", "warn", "error"].find((name2) => typeof logger[name2] === "function");
+        logLevel = ["info", "debug", "log", "trace", "warn", "error"].find(
+          (name2) => typeof logger[name2] === "function",
+        );
       }
       if (logLevel) {
         logger[logLevel](entry, message, ...args);
@@ -830,15 +868,16 @@ function requireShared() {
       });
       return response;
     };
-    module.exports.callbackPromise = (resolve2, reject) => function() {
-      const args = Array.from(arguments);
-      const err = args.shift();
-      if (err) {
-        reject(err);
-      } else {
-        resolve2(...args);
-      }
-    };
+    module.exports.callbackPromise = (resolve2, reject) =>
+      function () {
+        const args = Array.from(arguments);
+        const err = args.shift();
+        if (err) {
+          reject(err);
+        } else {
+          resolve2(...args);
+        }
+      };
     module.exports.parseDataURI = (uri) => {
       if (typeof uri !== "string") {
         return null;
@@ -892,7 +931,7 @@ function requireShared() {
         data: bufferData,
         encoding: encoding || null,
         contentType: contentType || "application/octet-stream",
-        params
+        params,
       };
     };
     module.exports.resolveContent = (data, key, options, callback) => {
@@ -911,8 +950,11 @@ function requireShared() {
       return promise;
     };
     function resolveContentValue(data, key, options, callback) {
-      let content = data && data[key] && data[key].content || data[key];
-      const encoding = (typeof data[key] === "object" && data[key].encoding || "utf8").toString().toLowerCase().replace(/[-_\s]/g, "");
+      let content = (data && data[key] && data[key].content) || data[key];
+      const encoding = ((typeof data[key] === "object" && data[key].encoding) || "utf8")
+        .toString()
+        .toLowerCase()
+        .replace(/[-_\s]/g, "");
       if (!content) {
         return callback(null, content);
       }
@@ -940,7 +982,10 @@ function requireShared() {
           return resolveStream(nmfetch(content.path || content.href), callback);
         } else if (/^data:/i.test(content.path || content.href)) {
           const parsedDataUri = module.exports.parseDataURI(content.path || content.href);
-          return callback(null, parsedDataUri && parsedDataUri.data ? parsedDataUri.data : Buffer.alloc(0));
+          return callback(
+            null,
+            parsedDataUri && parsedDataUri.data ? parsedDataUri.data : Buffer.alloc(0),
+          );
         } else if (content.path) {
           if (options.disableFileAccess) {
             return setImmediate(() => {
@@ -952,12 +997,15 @@ function requireShared() {
           return resolveStream(fs.createReadStream(content.path), callback);
         }
       }
-      if (typeof data[key].content === "string" && !["utf8", "usascii", "ascii"].includes(encoding)) {
+      if (
+        typeof data[key].content === "string" &&
+        !["utf8", "usascii", "ascii"].includes(encoding)
+      ) {
         content = Buffer.from(data[key].content, encoding);
       }
       setImmediate(() => callback(null, content));
     }
-    module.exports.assign = function() {
+    module.exports.assign = function () {
       const args = Array.from(arguments);
       const target = args.shift() || {};
       args.forEach((source) => {
@@ -1046,7 +1094,12 @@ function requireShared() {
         }
         message = util.format(message, ...args);
         message.split(/\r?\n/).forEach((line) => {
-          console.log("[%s] %s %s", (/* @__PURE__ */ new Date()).toISOString().substr(0, 19).replace(/T/, " "), levelNames.get(level), prefix + line);
+          console.log(
+            "[%s] %s %s",
+            /* @__PURE__ */ new Date().toISOString().substr(0, 19).replace(/T/, " "),
+            levelNames.get(level),
+            prefix + line,
+          );
         });
       };
       const logger = {};
@@ -1097,7 +1150,10 @@ function requireMimeTypes() {
     ["application/emma+xml", "emma"],
     ["application/envoy", "evy"],
     ["application/epub+zip", "epub"],
-    ["application/excel", ["xls", "xl", "xla", "xlb", "xlc", "xld", "xlk", "xll", "xlm", "xlt", "xlv", "xlw"]],
+    [
+      "application/excel",
+      ["xls", "xl", "xla", "xlb", "xlc", "xld", "xlk", "xll", "xlm", "xlt", "xlv", "xlw"],
+    ],
     ["application/exi", "exi"],
     ["application/font-tdpfr", "pfr"],
     ["application/fractals", "fif"],
@@ -1619,7 +1675,10 @@ function requireMimeTypes() {
     ["application/x-elc", "elc"],
     ["application/x-envoy", ["env", "evy"]],
     ["application/x-esrehber", "es"],
-    ["application/x-excel", ["xls", "xla", "xlb", "xlc", "xld", "xlk", "xll", "xlm", "xlt", "xlv", "xlw"]],
+    [
+      "application/x-excel",
+      ["xls", "xla", "xlb", "xlc", "xld", "xlk", "xll", "xlm", "xlt", "xlv", "xlw"],
+    ],
     ["application/x-font-bdf", "bdf"],
     ["application/x-font-ghostscript", "gsf"],
     ["application/x-font-linux-psf", "psf"],
@@ -1958,8 +2017,8 @@ function requireMimeTypes() {
         "mar",
         "pl",
         "sdml",
-        "text"
-      ]
+        "text",
+      ],
     ],
     ["text/plain-bas", "par"],
     ["text/prs.lines.tag", "dsc"],
@@ -2089,7 +2148,7 @@ function requireMimeTypes() {
     ["x-world/x-vrml", ["flr", "vrml", "wrl", "wrz", "xaf", "xof"]],
     ["x-world/x-vrt", "vrt"],
     ["xgl/drawing", "xgz"],
-    ["xgl/movie", "xmz"]
+    ["xgl/movie", "xmz"],
   ]);
   const extensions = /* @__PURE__ */ new Map([
     ["123", "application/vnd.lotus-1-2-3"],
@@ -2163,7 +2222,13 @@ function requireMimeTypes() {
     ["bh2", "application/vnd.fujitsu.oasysprs"],
     [
       "bin",
-      ["application/octet-stream", "application/mac-binary", "application/macbinary", "application/x-macbinary", "application/x-binary"]
+      [
+        "application/octet-stream",
+        "application/mac-binary",
+        "application/macbinary",
+        "application/x-macbinary",
+        "application/x-binary",
+      ],
     ],
     ["bm", "image/bmp"],
     ["bmi", "application/vnd.bmi"],
@@ -2211,7 +2276,13 @@ function requireMimeTypes() {
     ["cla", "application/vnd.claymore"],
     [
       "class",
-      ["application/octet-stream", "application/java", "application/java-byte-code", "application/java-vm", "application/x-java-class"]
+      [
+        "application/octet-stream",
+        "application/java",
+        "application/java-byte-code",
+        "application/java-vm",
+        "application/x-java-class",
+      ],
     ],
     ["clkk", "application/vnd.crick.clicker.keyboard"],
     ["clkp", "application/vnd.crick.clicker.palette"],
@@ -2232,7 +2303,10 @@ function requireMimeTypes() {
     ["cpt", ["application/mac-compactpro", "application/x-compactpro", "application/x-cpt"]],
     ["crd", "application/x-mscardfile"],
     ["crl", ["application/pkix-crl", "application/pkcs-crl"]],
-    ["crt", ["application/pkix-cert", "application/x-x509-user-cert", "application/x-x509-ca-cert"]],
+    [
+      "crt",
+      ["application/pkix-cert", "application/x-x509-user-cert", "application/x-x509-ca-cert"],
+    ],
     ["cryptonote", "application/vnd.rig.cryptonote"],
     ["csh", ["text/x-script.csh", "application/x-csh"]],
     ["csml", "chemical/x-csml"],
@@ -2391,7 +2465,10 @@ function requireMimeTypes() {
     ["hgl", "application/vnd.hp-hpgl"],
     ["hh", ["text/plain", "text/x-h"]],
     ["hlb", "text/x-script"],
-    ["hlp", ["application/winhlp", "application/hlp", "application/x-helpfile", "application/x-winhelp"]],
+    [
+      "hlp",
+      ["application/winhlp", "application/hlp", "application/x-helpfile", "application/x-winhelp"],
+    ],
     ["hpg", "application/vnd.hp-hpgl"],
     ["hpgl", "application/vnd.hp-hpgl"],
     ["hpid", "application/vnd.hp-hpid"],
@@ -2404,8 +2481,8 @@ function requireMimeTypes() {
         "application/binhex4",
         "application/mac-binhex",
         "application/x-binhex40",
-        "application/x-mac-binhex40"
-      ]
+        "application/x-mac-binhex40",
+      ],
     ],
     ["hta", "application/hta"],
     ["htc", "text/x-component"],
@@ -2472,7 +2549,16 @@ function requireMimeTypes() {
     ["jpgv", "video/jpeg"],
     ["jpm", "video/jpm"],
     ["jps", "image/x-jps"],
-    ["js", ["application/javascript", "application/ecmascript", "text/javascript", "text/ecmascript", "application/x-javascript"]],
+    [
+      "js",
+      [
+        "application/javascript",
+        "application/ecmascript",
+        "text/javascript",
+        "text/ecmascript",
+        "application/x-javascript",
+      ],
+    ],
     ["json", "application/json"],
     ["jut", "image/jutvision"],
     ["kar", ["audio/midi", "music/x-karaoke"]],
@@ -2549,8 +2635,29 @@ function requireMimeTypes() {
     ["mgz", "application/vnd.proteus.magazine"],
     ["mht", "message/rfc822"],
     ["mhtml", "message/rfc822"],
-    ["mid", ["audio/mid", "audio/midi", "music/crescendo", "x-music/x-midi", "audio/x-midi", "application/x-midi", "audio/x-mid"]],
-    ["midi", ["audio/midi", "music/crescendo", "x-music/x-midi", "audio/x-midi", "application/x-midi", "audio/x-mid"]],
+    [
+      "mid",
+      [
+        "audio/mid",
+        "audio/midi",
+        "music/crescendo",
+        "x-music/x-midi",
+        "audio/x-midi",
+        "application/x-midi",
+        "audio/x-mid",
+      ],
+    ],
+    [
+      "midi",
+      [
+        "audio/midi",
+        "music/crescendo",
+        "x-music/x-midi",
+        "audio/x-midi",
+        "application/x-midi",
+        "audio/x-mid",
+      ],
+    ],
     ["mif", ["application/vnd.mif", "application/x-mif", "application/x-frame"]],
     ["mime", ["message/rfc822", "www/mime"]],
     ["mj2", "video/mj2"],
@@ -2734,7 +2841,15 @@ function requireMimeTypes() {
     ["pps", ["application/vnd.ms-powerpoint", "application/mspowerpoint"]],
     ["ppsm", "application/vnd.ms-powerpoint.slideshow.macroenabled.12"],
     ["ppsx", "application/vnd.openxmlformats-officedocument.presentationml.slideshow"],
-    ["ppt", ["application/vnd.ms-powerpoint", "application/mspowerpoint", "application/powerpoint", "application/x-mspowerpoint"]],
+    [
+      "ppt",
+      [
+        "application/vnd.ms-powerpoint",
+        "application/mspowerpoint",
+        "application/powerpoint",
+        "application/x-mspowerpoint",
+      ],
+    ],
     ["pptm", "application/vnd.ms-powerpoint.presentation.macroenabled.12"],
     ["pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"],
     ["ppz", "application/mspowerpoint"],
@@ -2819,7 +2934,13 @@ function requireMimeTypes() {
     ["scd", "application/x-msschedule"],
     [
       "scm",
-      ["application/vnd.lotus-screencam", "video/x-scm", "text/x-script.guile", "application/x-lotusscreencam", "text/x-script.scheme"]
+      [
+        "application/vnd.lotus-screencam",
+        "video/x-scm",
+        "text/x-script.guile",
+        "application/x-lotusscreencam",
+        "text/x-script.scheme",
+      ],
     ],
     ["scq", "application/scvp-cv-request"],
     ["scs", "application/scvp-cv-response"],
@@ -2895,7 +3016,15 @@ function requireMimeTypes() {
     ["stf", "application/vnd.wt.stf"],
     ["sti", "application/vnd.sun.xml.impress.template"],
     ["stk", "application/hyperstudio"],
-    ["stl", ["application/vnd.ms-pkistl", "application/sla", "application/vnd.ms-pki.stl", "application/x-navistyle"]],
+    [
+      "stl",
+      [
+        "application/vnd.ms-pkistl",
+        "application/sla",
+        "application/vnd.ms-pki.stl",
+        "application/x-navistyle",
+      ],
+    ],
     ["stm", "text/html"],
     ["stp", "application/step"],
     ["str", "application/vnd.pg.format"],
@@ -3079,7 +3208,15 @@ function requireMimeTypes() {
     ["xhtml", "application/xhtml+xml"],
     ["xif", "image/vnd.xiff"],
     ["xl", "application/excel"],
-    ["xla", ["application/vnd.ms-excel", "application/excel", "application/x-msexcel", "application/x-excel"]],
+    [
+      "xla",
+      [
+        "application/vnd.ms-excel",
+        "application/excel",
+        "application/x-msexcel",
+        "application/x-excel",
+      ],
+    ],
     ["xlam", "application/vnd.ms-excel.addin.macroenabled.12"],
     ["xlb", ["application/excel", "application/vnd.ms-excel", "application/x-excel"]],
     ["xlc", ["application/vnd.ms-excel", "application/excel", "application/x-excel"]],
@@ -3087,7 +3224,15 @@ function requireMimeTypes() {
     ["xlk", ["application/excel", "application/x-excel"]],
     ["xll", ["application/excel", "application/vnd.ms-excel", "application/x-excel"]],
     ["xlm", ["application/vnd.ms-excel", "application/excel", "application/x-excel"]],
-    ["xls", ["application/vnd.ms-excel", "application/excel", "application/x-msexcel", "application/x-excel"]],
+    [
+      "xls",
+      [
+        "application/vnd.ms-excel",
+        "application/excel",
+        "application/x-msexcel",
+        "application/x-excel",
+      ],
+    ],
     ["xlsb", "application/vnd.ms-excel.sheet.binary.macroenabled.12"],
     ["xlsm", "application/vnd.ms-excel.sheet.macroenabled.12"],
     ["xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
@@ -3095,7 +3240,15 @@ function requireMimeTypes() {
     ["xltm", "application/vnd.ms-excel.template.macroenabled.12"],
     ["xltx", "application/vnd.openxmlformats-officedocument.spreadsheetml.template"],
     ["xlv", ["application/excel", "application/x-excel"]],
-    ["xlw", ["application/vnd.ms-excel", "application/excel", "application/x-msexcel", "application/x-excel"]],
+    [
+      "xlw",
+      [
+        "application/vnd.ms-excel",
+        "application/excel",
+        "application/x-msexcel",
+        "application/x-excel",
+      ],
+    ],
     ["xm", "audio/xm"],
     ["xml", ["application/xml", "text/xml", "application/atom+xml", "application/rss+xml"]],
     ["xmz", "xgl/movie"],
@@ -3119,11 +3272,19 @@ function requireMimeTypes() {
     ["yin", "application/yin+xml"],
     ["z", ["application/x-compressed", "application/x-compress"]],
     ["zaz", "application/vnd.zzazz.deck+xml"],
-    ["zip", ["application/zip", "multipart/x-zip", "application/x-zip-compressed", "application/x-compressed"]],
+    [
+      "zip",
+      [
+        "application/zip",
+        "multipart/x-zip",
+        "application/x-zip-compressed",
+        "application/x-compressed",
+      ],
+    ],
     ["zir", "application/vnd.zul"],
     ["zmm", "application/vnd.handheld-entertainment+xml"],
     ["zoo", "application/octet-stream"],
-    ["zsh", "text/x-script.zsh"]
+    ["zsh", "text/x-script.zsh"],
   ]);
   mimeTypes_1 = {
     detectMimeType(filename) {
@@ -3131,7 +3292,11 @@ function requireMimeTypes() {
         return defaultMimeType;
       }
       const parsed = path.parse(filename);
-      const extension = (parsed.ext.substr(1) || parsed.name || "").split("?").shift().trim().toLowerCase();
+      const extension = (parsed.ext.substr(1) || parsed.name || "")
+        .split("?")
+        .shift()
+        .trim()
+        .toLowerCase();
       const value = extensions.has(extension) ? extensions.get(extension) : defaultMimeType;
       if (Array.isArray(value)) {
         return value[0];
@@ -3158,7 +3323,7 @@ function requireMimeTypes() {
         default:
           return "bin";
       }
-    }
+    },
   };
   return mimeTypes_1;
 }
@@ -3182,7 +3347,7 @@ function requirePunycode() {
   const errors2 = {
     overflow: "Overflow: input needs wider integers to process",
     "not-basic": "Illegal input >= 0x80 (not a basic code point)",
-    "invalid-input": "Invalid input"
+    "invalid-input": "Invalid input",
   };
   const baseMinusTMin = base - tMin;
   const floor = Math.floor;
@@ -3231,7 +3396,7 @@ function requirePunycode() {
     return output;
   }
   const ucs2encode = (codePoints) => String.fromCodePoint(...codePoints);
-  const basicToDigit = function(codePoint) {
+  const basicToDigit = function (codePoint) {
     if (codePoint >= 48 && codePoint < 58) {
       return 26 + (codePoint - 48);
     }
@@ -3243,24 +3408,24 @@ function requirePunycode() {
     }
     return base;
   };
-  const digitToBasic = function(digit, flag) {
+  const digitToBasic = function (digit, flag) {
     return digit + 22 + 75 * (digit < 26) - ((flag != 0) << 5);
   };
-  const adapt = function(delta, numPoints, firstTime) {
+  const adapt = function (delta, numPoints, firstTime) {
     let k = 0;
     delta = firstTime ? floor(delta / damp) : delta >> 1;
     delta += floor(delta / numPoints);
     for (
       ;
       /* no initialization */
-      delta > baseMinusTMin * tMax >> 1;
+      delta > (baseMinusTMin * tMax) >> 1;
       k += base
     ) {
       delta = floor(delta / baseMinusTMin);
     }
-    return floor(k + (baseMinusTMin + 1) * delta / (delta + skew));
+    return floor(k + ((baseMinusTMin + 1) * delta) / (delta + skew));
   };
-  const decode = function(input) {
+  const decode = function (input) {
     const output = [];
     const inputLength = input.length;
     let i = 0;
@@ -3311,7 +3476,7 @@ function requirePunycode() {
     }
     return String.fromCodePoint(...output);
   };
-  const encode = function(input) {
+  const encode = function (input) {
     const output = [];
     input = ucs2decode(input);
     const inputLength = input.length;
@@ -3354,7 +3519,7 @@ function requirePunycode() {
             }
             const qMinusT = q - t;
             const baseMinusT = base - t;
-            output.push(stringFromCharCode(digitToBasic(t + qMinusT % baseMinusT, 0)));
+            output.push(stringFromCharCode(digitToBasic(t + (qMinusT % baseMinusT), 0)));
             q = floor(qMinusT / baseMinusT);
           }
           output.push(stringFromCharCode(digitToBasic(q, 0)));
@@ -3368,13 +3533,13 @@ function requirePunycode() {
     }
     return output.join("");
   };
-  const toUnicode = function(input) {
-    return mapDomain(input, function(string) {
+  const toUnicode = function (input) {
+    return mapDomain(input, function (string) {
       return regexPunycode.test(string) ? decode(string.slice(4).toLowerCase()) : string;
     });
   };
-  const toASCII = function(input) {
-    return mapDomain(input, function(string) {
+  const toASCII = function (input) {
+    return mapDomain(input, function (string) {
       return regexNonASCII.test(string) ? "xn--" + encode(string) : string;
     });
   };
@@ -3394,12 +3559,12 @@ function requirePunycode() {
      */
     ucs2: {
       decode: ucs2decode,
-      encode: ucs2encode
+      encode: ucs2encode,
     },
     decode,
     encode,
     toASCII,
-    toUnicode
+    toUnicode,
   };
   punycode_1 = punycode;
   return punycode_1;
@@ -3454,12 +3619,15 @@ function requireBase64() {
       }
       this.inputBytes += chunk.length;
       if (this._remainingBytes && this._remainingBytes.length) {
-        chunk = Buffer.concat([this._remainingBytes, chunk], this._remainingBytes.length + chunk.length);
+        chunk = Buffer.concat(
+          [this._remainingBytes, chunk],
+          this._remainingBytes.length + chunk.length,
+        );
         this._remainingBytes = false;
       }
       if (chunk.length % 3) {
-        this._remainingBytes = chunk.slice(chunk.length - chunk.length % 3);
-        chunk = chunk.slice(0, chunk.length - chunk.length % 3);
+        this._remainingBytes = chunk.slice(chunk.length - (chunk.length % 3));
+        chunk = chunk.slice(0, chunk.length - (chunk.length % 3));
       } else {
         this._remainingBytes = false;
       }
@@ -3499,7 +3667,7 @@ function requireBase64() {
   base64 = {
     encode,
     wrap,
-    Encoder
+    Encoder,
   };
   return base64;
 }
@@ -3518,7 +3686,7 @@ function requireQp() {
     // <CR>
     [32, 60],
     // <SP>!"#$%&'()*+,-./0123456789:;
-    [62, 126]
+    [62, 126],
     // >?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}
   ];
   function encode(buffer) {
@@ -3529,7 +3697,13 @@ function requireQp() {
     let ord;
     for (let i = 0, len = buffer.length; i < len; i++) {
       ord = buffer[i];
-      if (checkRanges(ord, QP_RANGES) && !((ord === 32 || ord === 9) && (i === len - 1 || buffer[i + 1] === 10 || buffer[i + 1] === 13))) {
+      if (
+        checkRanges(ord, QP_RANGES) &&
+        !(
+          (ord === 32 || ord === 9) &&
+          (i === len - 1 || buffer[i + 1] === 10 || buffer[i + 1] === 13)
+        )
+      ) {
         result += String.fromCharCode(ord);
         continue;
       }
@@ -3550,7 +3724,7 @@ function requireQp() {
     let result = "";
     while (pos < len) {
       line = str.substr(pos, lineLength);
-      if (match = line.match(/\r\n/)) {
+      if ((match = line.match(/\r\n/))) {
         line = line.substr(0, match.index + match[0].length);
         result += line;
         pos += line.length;
@@ -3561,19 +3735,27 @@ function requireQp() {
         pos += line.length;
         continue;
       }
-      if (match = line.substr(-lineMargin).match(/\n.*?$/)) {
+      if ((match = line.substr(-lineMargin).match(/\n.*?$/))) {
         line = line.substr(0, line.length - (match[0].length - 1));
         result += line;
         pos += line.length;
         continue;
       }
-      if (line.length > lineLength - lineMargin && (match = line.substr(-lineMargin).match(/[ \t.,!?][^ \t.,!?]*$/))) {
+      if (
+        line.length > lineLength - lineMargin &&
+        (match = line.substr(-lineMargin).match(/[ \t.,!?][^ \t.,!?]*$/))
+      ) {
         line = line.substr(0, line.length - (match[0].length - 1));
       } else if (line.match(/[=][\da-f]{0,2}$/i)) {
-        if (match = line.match(/[=][\da-f]{0,1}$/i)) {
+        if ((match = line.match(/[=][\da-f]{0,1}$/i))) {
           line = line.substr(0, line.length - match[0].length);
         }
-        while (line.length > 3 && line.length < len - pos && !line.match(/^(?:=[\da-f]{2}){1,4}$/i) && (match = line.match(/[=][\da-f]{2}$/gi))) {
+        while (
+          line.length > 3 &&
+          line.length < len - pos &&
+          !line.match(/^(?:=[\da-f]{2}){1,4}$/i) &&
+          (match = line.match(/[=][\da-f]{2}$/gi))
+        ) {
           code = parseInt(match[0].substr(1, 2), 16);
           if (code < 128) {
             break;
@@ -3663,7 +3845,7 @@ function requireQp() {
   qp = {
     encode,
     wrap,
-    Encoder
+    Encoder,
   };
   return qp;
 }
@@ -3683,7 +3865,9 @@ function requireMimeFuncs() {
      * @returns {Boolean} true if it is a plaintext string
      */
     isPlainText(value, isParam) {
-      const re = isParam ? /[\x00-\x08\x0b\x0c\x0e-\x1f"\u0080-\uFFFF]/ : /[\x00-\x08\x0b\x0c\x0e-\x1f\u0080-\uFFFF]/;
+      const re = isParam
+        ? /[\x00-\x08\x0b\x0c\x0e-\x1f"\u0080-\uFFFF]/
+        : /[\x00-\x08\x0b\x0c\x0e-\x1f\u0080-\uFFFF]/;
       return typeof value === "string" && !re.test(value);
     },
     /**
@@ -3729,11 +3913,16 @@ function requireMimeFuncs() {
         });
       } else if (mimeWordEncoding === "B") {
         encodedStr = typeof data === "string" ? data : base642.encode(data);
-        maxLength = maxLength ? Math.max(3, (maxLength - maxLength % 4) / 4 * 3) : 0;
+        maxLength = maxLength ? Math.max(3, ((maxLength - (maxLength % 4)) / 4) * 3) : 0;
       }
-      if (maxLength && (mimeWordEncoding !== "B" ? encodedStr : base642.encode(data)).length > maxLength) {
+      if (
+        maxLength &&
+        (mimeWordEncoding !== "B" ? encodedStr : base642.encode(data)).length > maxLength
+      ) {
         if (mimeWordEncoding === "Q") {
-          encodedStr = this.splitMimeEncodedString(encodedStr, maxLength).join("?= =?" + toCharset + "?" + mimeWordEncoding + "?");
+          encodedStr = this.splitMimeEncodedString(encodedStr, maxLength).join(
+            "?= =?" + toCharset + "?" + mimeWordEncoding + "?",
+          );
         } else {
           const parts = [];
           let lpart = "";
@@ -3761,7 +3950,15 @@ function requireMimeFuncs() {
       } else if (mimeWordEncoding === "B") {
         encodedStr = base642.encode(data);
       }
-      return "=?" + toCharset + "?" + mimeWordEncoding + "?" + encodedStr + (encodedStr.substr(-2) === "?=" ? "" : "?=");
+      return (
+        "=?" +
+        toCharset +
+        "?" +
+        mimeWordEncoding +
+        "?" +
+        encodedStr +
+        (encodedStr.substr(-2) === "?=" ? "" : "?=")
+      );
     },
     /**
      * Finds word sequences with non ascii text and converts these to mime words
@@ -3785,11 +3982,19 @@ function requireMimeFuncs() {
       if (!lastMatch) {
         return value;
       }
-      const startIndex = firstMatch.index + (firstMatch[0].match(/[^\s]/) || {
-        index: 0
-      }).index;
+      const startIndex =
+        firstMatch.index +
+        (
+          firstMatch[0].match(/[^\s]/) || {
+            index: 0,
+          }
+        ).index;
       const endIndex = lastMatch.index + (lastMatch[1] || "").length;
-      return (startIndex ? value.substr(0, startIndex) : "") + this.encodeWord(value.substring(startIndex, endIndex), mimeWordEncoding || "Q", maxLength) + (endIndex < value.length ? value.substr(endIndex) : "");
+      return (
+        (startIndex ? value.substr(0, startIndex) : "") +
+        this.encodeWord(value.substring(startIndex, endIndex), mimeWordEncoding || "Q", maxLength) +
+        (endIndex < value.length ? value.substr(endIndex) : "")
+      );
     },
     /**
      * Joins parsed header value together as 'value; param1=value1; param2=value2'
@@ -3804,7 +4009,10 @@ function requireMimeFuncs() {
         const value = structured.params[param];
         if (!this.isPlainText(value, true) || value.length >= 75) {
           this.buildHeaderParam(param, value, 50).forEach((encodedParam) => {
-            if (!/[\s"\\;:/=(),<>@[\]?]|^[-']|'$/.test(encodedParam.value) || encodedParam.key.substr(-1) === "*") {
+            if (
+              !/[\s"\\;:/=(),<>@[\]?]|^[-']|'$/.test(encodedParam.value) ||
+              encodedParam.key.substr(-1) === "*"
+            ) {
               paramsArray.push(encodedParam.key + "=" + encodedParam.value);
             } else {
               paramsArray.push(encodedParam.key + "=" + JSON.stringify(encodedParam.value));
@@ -3846,19 +4054,19 @@ function requireMimeFuncs() {
           return [
             {
               key,
-              value: encodedStr
-            }
+              value: encodedStr,
+            },
           ];
         }
         encodedStr = encodedStr.replace(new RegExp(".{" + maxLength + "}", "g"), (str) => {
           list.push({
-            line: str
+            line: str,
           });
           return "";
         });
         if (encodedStr) {
           list.push({
-            line: encodedStr
+            line: encodedStr,
           });
         }
       } else {
@@ -3890,7 +4098,7 @@ function requireMimeFuncs() {
               if ((this.safeEncodeURIComponent(line) + chr).length >= maxLength) {
                 list.push({
                   line,
-                  encoded
+                  encoded,
                 });
                 line = "";
                 startPos = i - 1;
@@ -3905,7 +4113,7 @@ function requireMimeFuncs() {
           if ((line + chr).length >= maxLength) {
             list.push({
               line,
-              encoded
+              encoded,
             });
             line = chr = encodedStr[i] === " " ? " " : this.safeEncodeURIComponent(encodedStr[i]);
             if (chr === encodedStr[i]) {
@@ -3921,7 +4129,7 @@ function requireMimeFuncs() {
         if (line) {
           list.push({
             line,
-            encoded
+            encoded,
           });
         }
       }
@@ -3930,7 +4138,7 @@ function requireMimeFuncs() {
         // unencoded lines: {name}*{part}
         // if any line needs to be encoded then the first line (part==0) is always encoded
         key: key + "*" + i2 + (item.encoded ? "*" : ""),
-        value: item.line
+        value: item.line,
       }));
     },
     /**
@@ -3951,7 +4159,7 @@ function requireMimeFuncs() {
     parseHeaderValue(str) {
       const response = {
         value: false,
-        params: {}
+        params: {},
       };
       let key = false;
       let value = "";
@@ -4004,17 +4212,21 @@ function requireMimeFuncs() {
       }
       Object.keys(response.params).forEach((key2) => {
         let actualKey, nr, match, value2;
-        if (match = key2.match(/(\*(\d+)|\*(\d+)\*|\*)$/)) {
+        if ((match = key2.match(/(\*(\d+)|\*(\d+)\*|\*)$/))) {
           actualKey = key2.substr(0, match.index);
           nr = Number(match[2] || match[3]) || 0;
           if (!response.params[actualKey] || typeof response.params[actualKey] !== "object") {
             response.params[actualKey] = {
               charset: false,
-              values: []
+              values: [],
             };
           }
           value2 = response.params[key2];
-          if (nr === 0 && match[0].substr(-1) === "*" && (match = value2.match(/^([^']*)'[^']*'(.*)$/))) {
+          if (
+            nr === 0 &&
+            match[0].substr(-1) === "*" &&
+            (match = value2.match(/^([^']*)'[^']*'(.*)$/))
+          ) {
             response.params[actualKey].charset = match[1] || "iso-8859-1";
             value2 = match[2];
           }
@@ -4027,13 +4239,20 @@ function requireMimeFuncs() {
         if (response.params[key2] && Array.isArray(response.params[key2].values)) {
           value2 = response.params[key2].values.map((val) => val || "").join("");
           if (response.params[key2].charset) {
-            response.params[key2] = "=?" + response.params[key2].charset + "?Q?" + value2.replace(/[=?_\s]/g, (s) => {
-              const c = s.charCodeAt(0).toString(16);
-              if (s === " ") {
-                return "_";
-              }
-              return "%" + (c.length < 2 ? "0" : "") + c;
-            }).replace(/%/g, "=") + "?=";
+            response.params[key2] =
+              "=?" +
+              response.params[key2].charset +
+              "?Q?" +
+              value2
+                .replace(/[=?_\s]/g, (s) => {
+                  const c = s.charCodeAt(0).toString(16);
+                  if (s === " ") {
+                    return "_";
+                  }
+                  return "%" + (c.length < 2 ? "0" : "") + c;
+                })
+                .replace(/%/g, "=") +
+              "?=";
           } else {
             response.params[key2] = value2;
           }
@@ -4079,15 +4298,23 @@ function requireMimeFuncs() {
           result += line;
           break;
         }
-        if (match = line.match(/^[^\n\r]*(\r?\n|\r)/)) {
+        if ((match = line.match(/^[^\n\r]*(\r?\n|\r)/))) {
           line = match[0];
           result += line;
           pos += line.length;
           continue;
-        } else if ((match = line.match(/(\s+)[^\s]*$/)) && match[0].length - (afterSpace ? (match[1] || "").length : 0) < line.length) {
-          line = line.substr(0, line.length - (match[0].length - (afterSpace ? (match[1] || "").length : 0)));
-        } else if (match = str.substr(pos + line.length).match(/^[^\s]+(\s*)/)) {
-          line = line + match[0].substr(0, match[0].length - (!afterSpace ? (match[1] || "").length : 0));
+        } else if (
+          (match = line.match(/(\s+)[^\s]*$/)) &&
+          match[0].length - (afterSpace ? (match[1] || "").length : 0) < line.length
+        ) {
+          line = line.substr(
+            0,
+            line.length - (match[0].length - (afterSpace ? (match[1] || "").length : 0)),
+          );
+        } else if ((match = str.substr(pos + line.length).match(/^[^\s]+(\s*)/))) {
+          line =
+            line +
+            match[0].substr(0, match[0].length - (!afterSpace ? (match[1] || "").length : 0));
         }
         result += line;
         pos += line.length;
@@ -4110,13 +4337,13 @@ function requireMimeFuncs() {
       maxlen = Math.max(maxlen || 0, 12);
       while (str.length) {
         curLine = str.substr(0, maxlen);
-        if (match = curLine.match(/[=][0-9A-F]?$/i)) {
+        if ((match = curLine.match(/[=][0-9A-F]?$/i))) {
           curLine = curLine.substr(0, match.index);
         }
         done = false;
         while (!done) {
           done = true;
-          if (match = str.substr(curLine.length).match(/^[=]([0-9A-F]{2})/i)) {
+          if ((match = str.substr(curLine.length).match(/^[=]([0-9A-F]{2})/i))) {
             chr = parseInt(match[1], 16);
             if (chr < 194 && chr > 127) {
               curLine = curLine.substr(0, curLine.length - 3);
@@ -4153,8 +4380,10 @@ function requireMimeFuncs() {
       } catch (_E) {
         return str.replace(/[^\x00-\x1F *'()<>@,;:\\"[\]?=\u007F-\uFFFF]+/g, "");
       }
-      return str.replace(/[\x00-\x1F *'()<>@,;:\\"[\]?=\u007F-\uFFFF]/g, (chr) => this.encodeURICharComponent(chr));
-    }
+      return str.replace(/[\x00-\x1F *'()<>@,;:\\"[\]?=\u007F-\uFFFF]/g, (chr) =>
+        this.encodeURICharComponent(chr),
+      );
+    },
   };
   return mimeFuncs;
 }
@@ -4172,7 +4401,7 @@ function requireAddressparser() {
       comment: [],
       group: [],
       text: [],
-      textWasQuoted: []
+      textWasQuoted: [],
     };
     let insideQuotes = false;
     for (let i = 0, len = tokens.length; i < len; i++) {
@@ -4238,7 +4467,7 @@ function requireAddressparser() {
       }
       addresses.push({
         name: data.text || "",
-        group: groupMembers
+        group: groupMembers,
       });
     } else {
       if (!data.address.length && data.text.length) {
@@ -4253,14 +4482,16 @@ function requireAddressparser() {
           let extracted = false;
           for (let i = data.text.length - 1; i >= 0; i--) {
             if (!data.textWasQuoted[i]) {
-              data.text[i] = data.text[i].replace(/\s*\b[^@\s]+@[^\s]+\b\s*/, (match) => {
-                if (!extracted) {
-                  data.address = [match.trim()];
-                  extracted = true;
-                  return " ";
-                }
-                return match;
-              }).trim();
+              data.text[i] = data.text[i]
+                .replace(/\s*\b[^@\s]+@[^\s]+\b\s*/, (match) => {
+                  if (!extracted) {
+                    data.address = [match.trim()];
+                    extracted = true;
+                    return " ";
+                  }
+                  return match;
+                })
+                .trim();
               if (extracted) {
                 break;
               }
@@ -4279,7 +4510,7 @@ function requireAddressparser() {
       data.address = data.address.join(" ");
       const address = {
         address: data.address || data.text || "",
-        name: data.text || data.address || ""
+        name: data.text || data.address || "",
       };
       if (address.address === address.name) {
         if (/@/.test(address.address || "")) {
@@ -4312,7 +4543,7 @@ function requireAddressparser() {
         // historically allowed the semicolon as a delimiter equivalent to the
         // comma in their UI, it makes sense to treat them the same as a comma
         // when used outside of a group.
-        ";": ""
+        ";": "",
       };
     }
     /**
@@ -4341,11 +4572,11 @@ function requireAddressparser() {
      * @param {String} chr Character from the address field
      */
     checkChar(chr, nextChr) {
-      if (this.escaped) ;
+      if (this.escaped);
       else if (chr === this.operatorExpecting) {
         this.node = {
           type: "operator",
-          value: chr
+          value: chr,
         };
         if (nextChr && ![" ", "	", "\r", "\n", ",", ";"].includes(nextChr)) {
           this.node.noBreak = true;
@@ -4358,7 +4589,7 @@ function requireAddressparser() {
       } else if (!this.operatorExpecting && chr in this.operators) {
         this.node = {
           type: "operator",
-          value: chr
+          value: chr,
         };
         this.list.push(this.node);
         this.node = null;
@@ -4372,7 +4603,7 @@ function requireAddressparser() {
       if (!this.node) {
         this.node = {
           type: "text",
-          value: ""
+          value: "",
         };
         this.list.push(this.node);
       }
@@ -4494,7 +4725,7 @@ function requireLeWindows() {
       let lastPos = 0;
       for (let i = 0, len = chunk.length; i < len; i++) {
         if (chunk[i] === 10) {
-          if (i && chunk[i - 1] !== 13 || !i && this.lastByte !== 13) {
+          if ((i && chunk[i - 1] !== 13) || (!i && this.lastByte !== 13)) {
             if (i > lastPos) {
               buf = chunk.slice(lastPos, i);
               this.push(buf);
@@ -4708,7 +4939,7 @@ function requireMimeNode() {
       key = this._normalizeHeaderKey(key);
       const headerValue = {
         key,
-        value
+        value,
       };
       for (let i = 0, len = this._headers.length; i < len; i++) {
         if (this._headers[i].key === key) {
@@ -4759,7 +4990,7 @@ function requireMimeNode() {
       }
       this._headers.push({
         key: this._normalizeHeaderKey(key),
-        value
+        value,
       });
       return this;
     }
@@ -4843,13 +5074,17 @@ function requireMimeNode() {
       let transferEncoding = false;
       const contentType = (this.getHeader("Content-Type") || "").toString().toLowerCase().trim();
       if (this.content) {
-        transferEncoding = (this.getHeader("Content-Transfer-Encoding") || "").toString().toLowerCase().trim();
+        transferEncoding = (this.getHeader("Content-Transfer-Encoding") || "")
+          .toString()
+          .toLowerCase()
+          .trim();
         if (!transferEncoding || !["base64", "quoted-printable"].includes(transferEncoding)) {
           if (/^text\//i.test(contentType)) {
             if (this._isPlainText && !this._hasLongLines) {
               transferEncoding = "7bit";
             } else if (typeof this.content === "string" || this.content instanceof Buffer) {
-              transferEncoding = this._getTextEncoding(this.content) === "Q" ? "quoted-printable" : "base64";
+              transferEncoding =
+                this._getTextEncoding(this.content) === "Q" ? "quoted-printable" : "base64";
             } else {
               transferEncoding = this.textEncoding === "B" ? "base64" : "quoted-printable";
             }
@@ -4927,7 +5162,11 @@ function requireMimeNode() {
           case "Content-Type":
             structured = mimeFuncs2.parseHeaderValue(value);
             this._handleContentType(structured);
-            if (structured.value.match(/^text\/plain\b/) && typeof this.content === "string" && /[\u0080-\uFFFF]/.test(this.content)) {
+            if (
+              structured.value.match(/^text\/plain\b/) &&
+              typeof this.content === "string" &&
+              /[\u0080-\uFFFF]/.test(this.content)
+            ) {
               structured.params.charset = "utf-8";
             }
             value = mimeFuncs2.buildHeaderValue(structured);
@@ -4978,7 +5217,8 @@ function requireMimeNode() {
         stream.end();
       });
       for (let i = 0, len = this._transforms.length; i < len; i++) {
-        transform = typeof this._transforms[i] === "function" ? this._transforms[i]() : this._transforms[i];
+        transform =
+          typeof this._transforms[i] === "function" ? this._transforms[i]() : this._transforms[i];
         outputStream.once("error", (err) => {
           transform.emit("error", err);
         });
@@ -4994,7 +5234,9 @@ function requireMimeNode() {
         outputStream = transform(outputStream);
       }
       if (this.newline) {
-        const winbreak = ["win", "windows", "dos", "\r\n"].includes(this.newline.toString().toLowerCase());
+        const winbreak = ["win", "windows", "dos", "\r\n"].includes(
+          this.newline.toString().toLowerCase(),
+        );
         const newlineTransform = winbreak ? new LeWindows() : new LeUnix();
         const stream2 = outputStream.pipe(newlineTransform);
         outputStream.on("error", (err) => stream2.emit("error", err));
@@ -5070,7 +5312,7 @@ function requireMimeNode() {
             if (["quoted-printable", "base64"].includes(transferEncoding)) {
               contentStream = new (transferEncoding === "base64" ? base642 : qp2).Encoder(options);
               contentStream.pipe(outputStream, {
-                end: false
+                end: false,
               });
               contentStream.once("end", finalize);
               contentStream.once("error", (err) => callback(err));
@@ -5079,7 +5321,7 @@ function requireMimeNode() {
             } else {
               localStream = this._getStream(this.content);
               localStream.pipe(outputStream, {
-                end: false
+                end: false,
               });
               localStream.once("end", finalize);
             }
@@ -5130,7 +5372,7 @@ function requireMimeNode() {
           }
           const raw = this._getStream(this._raw);
           raw.pipe(outputStream, {
-            end: false
+            end: false,
           });
           raw.on("error", (err) => outputStream.emit("error", err));
           raw.on("end", finalize);
@@ -5149,7 +5391,7 @@ function requireMimeNode() {
       let list;
       this._envelope = {
         from: false,
-        to: []
+        to: [],
       };
       if (envelope.from) {
         list = [];
@@ -5202,11 +5444,14 @@ function requireMimeNode() {
       }
       const envelope = {
         from: false,
-        to: []
+        to: [],
       };
       this._headers.forEach((header) => {
         const list = [];
-        if (header.key === "From" || !envelope.from && ["Reply-To", "Sender"].includes(header.key)) {
+        if (
+          header.key === "From" ||
+          (!envelope.from && ["Reply-To", "Sender"].includes(header.key))
+        ) {
           this._convertAddresses(this._parseAddresses(header.value), list);
           if (list.length && list[0]) {
             envelope.from = list[0].address;
@@ -5321,7 +5566,7 @@ function requireMimeNode() {
             return [address];
           }
           return addressparser(address);
-        })
+        }),
       );
     }
     /**
@@ -5331,7 +5576,15 @@ function requireMimeNode() {
      * @return {String} key in Camel-Case form
      */
     _normalizeHeaderKey(key) {
-      key = (key || "").toString().replace(/\r?\n|\r/g, " ").trim().toLowerCase().replace(/^X-SMTPAPI$|^(MIME|DKIM|ARC|BIMI)\b|^[a-z]|-(SPF|FBL|ID|MD5)$|-[a-z]/gi, (c) => c.toUpperCase()).replace(/^Content-Features$/i, "Content-features");
+      key = (key || "")
+        .toString()
+        .replace(/\r?\n|\r/g, " ")
+        .trim()
+        .toLowerCase()
+        .replace(/^X-SMTPAPI$|^(MIME|DKIM|ARC|BIMI)\b|^[a-z]|-(SPF|FBL|ID|MD5)$|-[a-z]/gi, (c) =>
+          c.toUpperCase(),
+        )
+        .replace(/^Content-Features$/i, "Content-features");
       return key;
     }
     /**
@@ -5342,9 +5595,12 @@ function requireMimeNode() {
      */
     _handleContentType(structured) {
       this.contentType = structured.value.trim().toLowerCase();
-      this.multipart = /^multipart\//i.test(this.contentType) ? this.contentType.substr(this.contentType.indexOf("/") + 1) : false;
+      this.multipart = /^multipart\//i.test(this.contentType)
+        ? this.contentType.substr(this.contentType.indexOf("/") + 1)
+        : false;
       if (this.multipart) {
-        this.boundary = structured.params.boundary = structured.params.boundary || this.boundary || this._generateBoundary();
+        this.boundary = structured.params.boundary =
+          structured.params.boundary || this.boundary || this._generateBoundary();
       } else {
         this.boundary = false;
       }
@@ -5355,7 +5611,9 @@ function requireMimeNode() {
      * @return {String} boundary value
      */
     _generateBoundary() {
-      return this.rootNode.boundaryPrefix + "-" + this.rootNode.baseBoundary + "-Part_" + this._nodeId;
+      return (
+        this.rootNode.boundaryPrefix + "-" + this.rootNode.baseBoundary + "-Part_" + this._nodeId
+      );
     }
     /**
      * Encodes a header value for use in the generated rfc2822 email.
@@ -5388,21 +5646,26 @@ function requireMimeNode() {
           return value;
         // space separated list of values enclosed in <>
         case "References":
-          value = [].concat.apply(
-            [],
-            [].concat(value || "").map((elm) => {
-              elm = (elm || "").toString().replace(/\r?\n|\r/g, " ").trim();
-              return elm.replace(/<[^>]*>/g, (str) => str.replace(/\s/g, "")).split(/\s+/);
-            })
-          ).map((elm) => {
-            if (elm.charAt(0) !== "<") {
-              elm = "<" + elm;
-            }
-            if (elm.charAt(elm.length - 1) !== ">") {
-              elm = elm + ">";
-            }
-            return elm;
-          });
+          value = [].concat
+            .apply(
+              [],
+              [].concat(value || "").map((elm) => {
+                elm = (elm || "")
+                  .toString()
+                  .replace(/\r?\n|\r/g, " ")
+                  .trim();
+                return elm.replace(/<[^>]*>/g, (str) => str.replace(/\s/g, "")).split(/\s+/);
+              }),
+            )
+            .map((elm) => {
+              if (elm.charAt(0) !== "<") {
+                elm = "<" + elm;
+              }
+              if (elm.charAt(elm.length - 1) !== ">") {
+                elm = elm + ">";
+              }
+              return elm;
+            });
           return value.join(" ").trim();
         case "Date":
           if (Object.prototype.toString.call(value) === "[object Date]") {
@@ -5432,7 +5695,9 @@ function requireMimeNode() {
         if (address.address) {
           address.address = this._normalizeAddress(address.address);
           if (!address.name) {
-            values.push(address.address.indexOf(" ") >= 0 ? `<${address.address}>` : `${address.address}`);
+            values.push(
+              address.address.indexOf(" ") >= 0 ? `<${address.address}>` : `${address.address}`,
+            );
           } else {
             values.push(`${this._encodeAddressName(address.name)} <${address.address}>`);
           }
@@ -5440,7 +5705,9 @@ function requireMimeNode() {
             uniqueList.push(address);
           }
         } else if (address.group) {
-          const groupListAddresses = (address.group.length ? this._convertAddresses(address.group, uniqueList) : "").trim();
+          const groupListAddresses = (
+            address.group.length ? this._convertAddresses(address.group, uniqueList) : ""
+          ).trim();
           values.push(`${this._encodeAddressName(address.name)}:${groupListAddresses};`);
         }
       });
@@ -5453,7 +5720,10 @@ function requireMimeNode() {
      * @return {String} address string
      */
     _normalizeAddress(address) {
-      address = (address || "").toString().replace(/[\x00-\x1F<>]+/g, " ").trim();
+      address = (address || "")
+        .toString()
+        .replace(/[\x00-\x1F<>]+/g, " ")
+        .trim();
       const lastAt = address.lastIndexOf("@");
       if (lastAt < 0) {
         return address;
@@ -5467,8 +5737,7 @@ function requireMimeNode() {
         } else {
           encodedDomain = punycode.toASCII(domain.toLowerCase());
         }
-      } catch (_err) {
-      }
+      } catch (_err) {}
       if (user.indexOf(" ") >= 0) {
         if (user.charAt(0) !== '"') {
           user = '"' + user;
@@ -5519,9 +5788,15 @@ function requireMimeNode() {
       let latinLen = 0;
       for (let i = 0, len = value.length; i < len; i++) {
         const code = value.charCodeAt(i);
-        if (code >= 0 && code <= 8 || code === 11 || code === 12 || code >= 14 && code <= 31 || code >= 128) {
+        if (
+          (code >= 0 && code <= 8) ||
+          code === 11 ||
+          code === 12 ||
+          (code >= 14 && code <= 31) ||
+          code >= 128
+        ) {
           nonLatinLen++;
-        } else if (code >= 65 && code <= 90 || code >= 97 && code <= 122) {
+        } else if ((code >= 65 && code <= 90) || (code >= 97 && code <= 122)) {
           latinLen++;
         }
       }
@@ -5533,12 +5808,17 @@ function requireMimeNode() {
      * @return {String} Random Message-ID value
      */
     _generateMessageId() {
-      return "<" + [2, 2, 2, 6].reduce(
-        // crux to generate UUID-like random strings
-        (prev, len) => prev + "-" + crypto.randomBytes(len).toString("hex"),
-        crypto.randomBytes(4).toString("hex")
-      ) + "@" + // try to use the domain of the FROM address or fallback to server hostname
-      (this.getEnvelope().from || this.hostname || "localhost").split("@").pop() + ">";
+      return (
+        "<" +
+        [2, 2, 2, 6].reduce(
+          // crux to generate UUID-like random strings
+          (prev, len) => prev + "-" + crypto.randomBytes(len).toString("hex"),
+          crypto.randomBytes(4).toString("hex"),
+        ) +
+        "@" + // try to use the domain of the FROM address or fallback to server hostname
+        (this.getEnvelope().from || this.hostname || "localhost").split("@").pop() +
+        ">"
+      );
     }
   }
   mimeNode = MimeNode;
@@ -5562,13 +5842,19 @@ function requireMailComposer() {
      */
     compile() {
       this._alternatives = this.getAlternatives();
-      this._htmlNode = this._alternatives.filter((alternative) => /^text\/html\b/i.test(alternative.contentType)).pop();
+      this._htmlNode = this._alternatives
+        .filter((alternative) => /^text\/html\b/i.test(alternative.contentType))
+        .pop();
       this._attachments = this.getAttachments(!!this._htmlNode);
       this._useRelated = !!(this._htmlNode && this._attachments.related.length);
       this._useAlternative = this._alternatives.length > 1;
-      this._useMixed = this._attachments.attached.length > 1 || this._alternatives.length && this._attachments.attached.length === 1;
+      this._useMixed =
+        this._attachments.attached.length > 1 ||
+        (this._alternatives.length && this._attachments.attached.length === 1);
       if (this.mail.raw) {
-        this.message = new MimeNode("message/rfc822", { newline: this.mail.newline }).setRaw(this.mail.raw);
+        this.message = new MimeNode("message/rfc822", { newline: this.mail.newline }).setRaw(
+          this.mail.raw,
+        );
       } else if (this._useMixed) {
         this.message = this._createMixed();
       } else if (this._useAlternative) {
@@ -5578,16 +5864,31 @@ function requireMailComposer() {
       } else {
         this.message = this._createContentNode(
           false,
-          [].concat(this._alternatives || []).concat(this._attachments.attached || []).shift() || {
+          []
+            .concat(this._alternatives || [])
+            .concat(this._attachments.attached || [])
+            .shift() || {
             contentType: "text/plain",
-            content: ""
-          }
+            content: "",
+          },
         );
       }
       if (this.mail.headers) {
         this.message.addHeader(this.mail.headers);
       }
-      ["from", "sender", "to", "cc", "bcc", "reply-to", "in-reply-to", "references", "subject", "message-id", "date"].forEach((header) => {
+      [
+        "from",
+        "sender",
+        "to",
+        "cc",
+        "bcc",
+        "reply-to",
+        "in-reply-to",
+        "references",
+        "subject",
+        "message-id",
+        "date",
+      ].forEach((header) => {
         const key = header.replace(/-(\w)/g, (o, c) => c.toUpperCase());
         if (this.mail[key]) {
           this.message.setHeader(header, this.mail[key]);
@@ -5611,10 +5912,16 @@ function requireMailComposer() {
         if (/^data:/i.test(attachment.path || attachment.href)) {
           attachment = this._processDataUrl(attachment);
         }
-        const contentType = attachment.contentType || mimeFuncs2.detectMimeType(attachment.filename || attachment.path || attachment.href || "bin");
+        const contentType =
+          attachment.contentType ||
+          mimeFuncs2.detectMimeType(
+            attachment.filename || attachment.path || attachment.href || "bin",
+          );
         const isImage = /^image\//i.test(contentType);
         const isMessageNode = /^message\//i.test(contentType);
-        const contentDisposition = attachment.contentDisposition || (isMessageNode || isImage && attachment.cid ? "inline" : "attachment");
+        const contentDisposition =
+          attachment.contentDisposition ||
+          (isMessageNode || (isImage && attachment.cid) ? "inline" : "attachment");
         let contentTransferEncoding;
         if ("contentTransferEncoding" in attachment) {
           contentTransferEncoding = attachment.contentTransferEncoding;
@@ -5626,12 +5933,14 @@ function requireMailComposer() {
         const data = {
           contentType,
           contentDisposition,
-          contentTransferEncoding
+          contentTransferEncoding,
         };
         if (attachment.filename) {
           data.filename = attachment.filename;
         } else if (!isMessageNode && attachment.filename !== false) {
-          data.filename = (attachment.path || attachment.href || "").split("/").pop().split("?").shift() || "attachment-" + (i + 1);
+          data.filename =
+            (attachment.path || attachment.href || "").split("/").pop().split("?").shift() ||
+            "attachment-" + (i + 1);
           if (data.filename.indexOf(".") < 0) {
             data.filename += "." + mimeFuncs2.detectExtension(data.contentType);
           }
@@ -5647,12 +5956,12 @@ function requireMailComposer() {
           data.raw = attachment.raw;
         } else if (attachment.path) {
           data.content = {
-            path: attachment.path
+            path: attachment.path,
           };
         } else if (attachment.href) {
           data.content = {
             href: attachment.href,
-            httpHeaders: attachment.httpHeaders
+            httpHeaders: attachment.httpHeaders,
           };
         } else {
           data.content = attachment.content || "";
@@ -5678,12 +5987,12 @@ function requireMailComposer() {
       if (!findRelated) {
         return {
           attached: attachments.concat(eventObject || []),
-          related: []
+          related: [],
         };
       }
       return {
         attached: attachments.filter((attachment) => !attachment.cid).concat(eventObject || []),
-        related: attachments.filter((attachment) => !!attachment.cid)
+        related: attachments.filter((attachment) => !!attachment.cid),
       };
     }
     /**
@@ -5698,11 +6007,17 @@ function requireMailComposer() {
     _getIcalEvent() {
       if (!this._icalEvent) {
         let icalEvent;
-        if (typeof this.mail.icalEvent === "object" && (this.mail.icalEvent.content || this.mail.icalEvent.path || this.mail.icalEvent.href || this.mail.icalEvent.raw)) {
+        if (
+          typeof this.mail.icalEvent === "object" &&
+          (this.mail.icalEvent.content ||
+            this.mail.icalEvent.path ||
+            this.mail.icalEvent.href ||
+            this.mail.icalEvent.raw)
+        ) {
           icalEvent = Object.assign({}, this.mail.icalEvent);
         } else {
           icalEvent = {
-            content: this.mail.icalEvent
+            content: this.mail.icalEvent,
           };
         }
         if (/^data:/i.test(icalEvent.path || icalEvent.href)) {
@@ -5715,13 +6030,13 @@ function requireMailComposer() {
         if (!icalEvent.raw) {
           if (icalEvent.path) {
             icalEvent.content = {
-              path: icalEvent.path
+              path: icalEvent.path,
             };
             icalEvent.path = void 0;
           } else if (icalEvent.href) {
             icalEvent.content = {
               href: icalEvent.href,
-              httpHeaders: icalEvent.httpHeaders
+              httpHeaders: icalEvent.httpHeaders,
             };
             icalEvent.href = void 0;
           }
@@ -5742,31 +6057,46 @@ function requireMailComposer() {
       const alternatives = [];
       let text, html, watchHtml, amp, eventObject;
       if (this.mail.text) {
-        if (typeof this.mail.text === "object" && (this.mail.text.content || this.mail.text.path || this.mail.text.href || this.mail.text.raw)) {
+        if (
+          typeof this.mail.text === "object" &&
+          (this.mail.text.content ||
+            this.mail.text.path ||
+            this.mail.text.href ||
+            this.mail.text.raw)
+        ) {
           text = this.mail.text;
         } else {
           text = {
-            content: this.mail.text
+            content: this.mail.text,
           };
         }
         text.contentType = "text/plain; charset=utf-8";
       }
       if (this.mail.watchHtml) {
-        if (typeof this.mail.watchHtml === "object" && (this.mail.watchHtml.content || this.mail.watchHtml.path || this.mail.watchHtml.href || this.mail.watchHtml.raw)) {
+        if (
+          typeof this.mail.watchHtml === "object" &&
+          (this.mail.watchHtml.content ||
+            this.mail.watchHtml.path ||
+            this.mail.watchHtml.href ||
+            this.mail.watchHtml.raw)
+        ) {
           watchHtml = this.mail.watchHtml;
         } else {
           watchHtml = {
-            content: this.mail.watchHtml
+            content: this.mail.watchHtml,
           };
         }
         watchHtml.contentType = "text/watch-html; charset=utf-8";
       }
       if (this.mail.amp) {
-        if (typeof this.mail.amp === "object" && (this.mail.amp.content || this.mail.amp.path || this.mail.amp.href || this.mail.amp.raw)) {
+        if (
+          typeof this.mail.amp === "object" &&
+          (this.mail.amp.content || this.mail.amp.path || this.mail.amp.href || this.mail.amp.raw)
+        ) {
           amp = this.mail.amp;
         } else {
           amp = {
-            content: this.mail.amp
+            content: this.mail.amp,
           };
         }
         amp.contentType = "text/x-amp-html; charset=utf-8";
@@ -5774,57 +6104,76 @@ function requireMailComposer() {
       if (this.mail.icalEvent) {
         eventObject = Object.assign({}, this._getIcalEvent());
         eventObject.filename = false;
-        eventObject.contentType = "text/calendar; charset=utf-8; method=" + (eventObject.method || "PUBLISH").toString().trim().toUpperCase();
+        eventObject.contentType =
+          "text/calendar; charset=utf-8; method=" +
+          (eventObject.method || "PUBLISH").toString().trim().toUpperCase();
         if (!eventObject.headers) {
           eventObject.headers = {};
         }
       }
       if (this.mail.html) {
-        if (typeof this.mail.html === "object" && (this.mail.html.content || this.mail.html.path || this.mail.html.href || this.mail.html.raw)) {
+        if (
+          typeof this.mail.html === "object" &&
+          (this.mail.html.content ||
+            this.mail.html.path ||
+            this.mail.html.href ||
+            this.mail.html.raw)
+        ) {
           html = this.mail.html;
         } else {
           html = {
-            content: this.mail.html
+            content: this.mail.html,
           };
         }
         html.contentType = "text/html; charset=utf-8";
       }
-      [].concat(text || []).concat(watchHtml || []).concat(amp || []).concat(html || []).concat(eventObject || []).concat(this.mail.alternatives || []).forEach((alternative) => {
-        if (/^data:/i.test(alternative.path || alternative.href)) {
-          alternative = this._processDataUrl(alternative);
-        }
-        const data = {
-          contentType: alternative.contentType || mimeFuncs2.detectMimeType(alternative.filename || alternative.path || alternative.href || "txt"),
-          contentTransferEncoding: alternative.contentTransferEncoding
-        };
-        if (alternative.filename) {
-          data.filename = alternative.filename;
-        }
-        if (/^https?:\/\//i.test(alternative.path)) {
-          alternative.href = alternative.path;
-          alternative.path = void 0;
-        }
-        if (alternative.raw) {
-          data.raw = alternative.raw;
-        } else if (alternative.path) {
-          data.content = {
-            path: alternative.path
+      []
+        .concat(text || [])
+        .concat(watchHtml || [])
+        .concat(amp || [])
+        .concat(html || [])
+        .concat(eventObject || [])
+        .concat(this.mail.alternatives || [])
+        .forEach((alternative) => {
+          if (/^data:/i.test(alternative.path || alternative.href)) {
+            alternative = this._processDataUrl(alternative);
+          }
+          const data = {
+            contentType:
+              alternative.contentType ||
+              mimeFuncs2.detectMimeType(
+                alternative.filename || alternative.path || alternative.href || "txt",
+              ),
+            contentTransferEncoding: alternative.contentTransferEncoding,
           };
-        } else if (alternative.href) {
-          data.content = {
-            href: alternative.href
-          };
-        } else {
-          data.content = alternative.content || "";
-        }
-        if (alternative.encoding) {
-          data.encoding = alternative.encoding;
-        }
-        if (alternative.headers) {
-          data.headers = alternative.headers;
-        }
-        alternatives.push(data);
-      });
+          if (alternative.filename) {
+            data.filename = alternative.filename;
+          }
+          if (/^https?:\/\//i.test(alternative.path)) {
+            alternative.href = alternative.path;
+            alternative.path = void 0;
+          }
+          if (alternative.raw) {
+            data.raw = alternative.raw;
+          } else if (alternative.path) {
+            data.content = {
+              path: alternative.path,
+            };
+          } else if (alternative.href) {
+            data.content = {
+              href: alternative.href,
+            };
+          } else {
+            data.content = alternative.content || "";
+          }
+          if (alternative.encoding) {
+            data.encoding = alternative.encoding;
+          }
+          if (alternative.headers) {
+            data.headers = alternative.headers;
+          }
+          alternatives.push(data);
+        });
       return alternatives;
     }
     /**
@@ -5835,30 +6184,35 @@ function requireMailComposer() {
      * @returns {Object} MimeNode node element
      */
     _createMixed(parentNode) {
-      const node = parentNode ? parentNode.createChild("multipart/mixed", {
-        disableUrlAccess: this.mail.disableUrlAccess,
-        disableFileAccess: this.mail.disableFileAccess,
-        normalizeHeaderKey: this.mail.normalizeHeaderKey,
-        newline: this.mail.newline
-      }) : new MimeNode("multipart/mixed", {
-        baseBoundary: this.mail.baseBoundary,
-        textEncoding: this.mail.textEncoding,
-        boundaryPrefix: this.mail.boundaryPrefix,
-        disableUrlAccess: this.mail.disableUrlAccess,
-        disableFileAccess: this.mail.disableFileAccess,
-        normalizeHeaderKey: this.mail.normalizeHeaderKey,
-        newline: this.mail.newline
-      });
+      const node = parentNode
+        ? parentNode.createChild("multipart/mixed", {
+            disableUrlAccess: this.mail.disableUrlAccess,
+            disableFileAccess: this.mail.disableFileAccess,
+            normalizeHeaderKey: this.mail.normalizeHeaderKey,
+            newline: this.mail.newline,
+          })
+        : new MimeNode("multipart/mixed", {
+            baseBoundary: this.mail.baseBoundary,
+            textEncoding: this.mail.textEncoding,
+            boundaryPrefix: this.mail.boundaryPrefix,
+            disableUrlAccess: this.mail.disableUrlAccess,
+            disableFileAccess: this.mail.disableFileAccess,
+            normalizeHeaderKey: this.mail.normalizeHeaderKey,
+            newline: this.mail.newline,
+          });
       if (this._useAlternative) {
         this._createAlternative(node);
       } else if (this._useRelated) {
         this._createRelated(node);
       }
-      [].concat(!this._useAlternative && this._alternatives || []).concat(this._attachments.attached || []).forEach((element) => {
-        if (!this._useRelated || element !== this._htmlNode) {
-          this._createContentNode(node, element);
-        }
-      });
+      []
+        .concat((!this._useAlternative && this._alternatives) || [])
+        .concat(this._attachments.attached || [])
+        .forEach((element) => {
+          if (!this._useRelated || element !== this._htmlNode) {
+            this._createContentNode(node, element);
+          }
+        });
       return node;
     }
     /**
@@ -5869,20 +6223,22 @@ function requireMailComposer() {
      * @returns {Object} MimeNode node element
      */
     _createAlternative(parentNode) {
-      const node = parentNode ? parentNode.createChild("multipart/alternative", {
-        disableUrlAccess: this.mail.disableUrlAccess,
-        disableFileAccess: this.mail.disableFileAccess,
-        normalizeHeaderKey: this.mail.normalizeHeaderKey,
-        newline: this.mail.newline
-      }) : new MimeNode("multipart/alternative", {
-        baseBoundary: this.mail.baseBoundary,
-        textEncoding: this.mail.textEncoding,
-        boundaryPrefix: this.mail.boundaryPrefix,
-        disableUrlAccess: this.mail.disableUrlAccess,
-        disableFileAccess: this.mail.disableFileAccess,
-        normalizeHeaderKey: this.mail.normalizeHeaderKey,
-        newline: this.mail.newline
-      });
+      const node = parentNode
+        ? parentNode.createChild("multipart/alternative", {
+            disableUrlAccess: this.mail.disableUrlAccess,
+            disableFileAccess: this.mail.disableFileAccess,
+            normalizeHeaderKey: this.mail.normalizeHeaderKey,
+            newline: this.mail.newline,
+          })
+        : new MimeNode("multipart/alternative", {
+            baseBoundary: this.mail.baseBoundary,
+            textEncoding: this.mail.textEncoding,
+            boundaryPrefix: this.mail.boundaryPrefix,
+            disableUrlAccess: this.mail.disableUrlAccess,
+            disableFileAccess: this.mail.disableFileAccess,
+            normalizeHeaderKey: this.mail.normalizeHeaderKey,
+            newline: this.mail.newline,
+          });
       this._alternatives.forEach((alternative) => {
         if (this._useRelated && this._htmlNode === alternative) {
           this._createRelated(node);
@@ -5899,22 +6255,26 @@ function requireMailComposer() {
      * @returns {Object} MimeNode node element
      */
     _createRelated(parentNode) {
-      const node = parentNode ? parentNode.createChild('multipart/related; type="text/html"', {
-        disableUrlAccess: this.mail.disableUrlAccess,
-        disableFileAccess: this.mail.disableFileAccess,
-        normalizeHeaderKey: this.mail.normalizeHeaderKey,
-        newline: this.mail.newline
-      }) : new MimeNode('multipart/related; type="text/html"', {
-        baseBoundary: this.mail.baseBoundary,
-        textEncoding: this.mail.textEncoding,
-        boundaryPrefix: this.mail.boundaryPrefix,
-        disableUrlAccess: this.mail.disableUrlAccess,
-        disableFileAccess: this.mail.disableFileAccess,
-        normalizeHeaderKey: this.mail.normalizeHeaderKey,
-        newline: this.mail.newline
-      });
+      const node = parentNode
+        ? parentNode.createChild('multipart/related; type="text/html"', {
+            disableUrlAccess: this.mail.disableUrlAccess,
+            disableFileAccess: this.mail.disableFileAccess,
+            normalizeHeaderKey: this.mail.normalizeHeaderKey,
+            newline: this.mail.newline,
+          })
+        : new MimeNode('multipart/related; type="text/html"', {
+            baseBoundary: this.mail.baseBoundary,
+            textEncoding: this.mail.textEncoding,
+            boundaryPrefix: this.mail.boundaryPrefix,
+            disableUrlAccess: this.mail.disableUrlAccess,
+            disableFileAccess: this.mail.disableFileAccess,
+            normalizeHeaderKey: this.mail.normalizeHeaderKey,
+            newline: this.mail.newline,
+          });
       this._createContentNode(node, this._htmlNode);
-      this._attachments.related.forEach((alternative) => this._createContentNode(node, alternative));
+      this._attachments.related.forEach((alternative) =>
+        this._createContentNode(node, alternative),
+      );
       return node;
     }
     /**
@@ -5927,24 +6287,29 @@ function requireMailComposer() {
     _createContentNode(parentNode, element) {
       element = element || {};
       element.content = element.content || "";
-      const encoding = (element.encoding || "utf8").toString().toLowerCase().replace(/[-_\s]/g, "");
-      const node = parentNode ? parentNode.createChild(element.contentType, {
-        filename: element.filename,
-        textEncoding: this.mail.textEncoding,
-        disableUrlAccess: this.mail.disableUrlAccess,
-        disableFileAccess: this.mail.disableFileAccess,
-        normalizeHeaderKey: this.mail.normalizeHeaderKey,
-        newline: this.mail.newline
-      }) : new MimeNode(element.contentType, {
-        filename: element.filename,
-        baseBoundary: this.mail.baseBoundary,
-        textEncoding: this.mail.textEncoding,
-        boundaryPrefix: this.mail.boundaryPrefix,
-        disableUrlAccess: this.mail.disableUrlAccess,
-        disableFileAccess: this.mail.disableFileAccess,
-        normalizeHeaderKey: this.mail.normalizeHeaderKey,
-        newline: this.mail.newline
-      });
+      const encoding = (element.encoding || "utf8")
+        .toString()
+        .toLowerCase()
+        .replace(/[-_\s]/g, "");
+      const node = parentNode
+        ? parentNode.createChild(element.contentType, {
+            filename: element.filename,
+            textEncoding: this.mail.textEncoding,
+            disableUrlAccess: this.mail.disableUrlAccess,
+            disableFileAccess: this.mail.disableFileAccess,
+            normalizeHeaderKey: this.mail.normalizeHeaderKey,
+            newline: this.mail.newline,
+          })
+        : new MimeNode(element.contentType, {
+            filename: element.filename,
+            baseBoundary: this.mail.baseBoundary,
+            textEncoding: this.mail.textEncoding,
+            boundaryPrefix: this.mail.boundaryPrefix,
+            disableUrlAccess: this.mail.disableUrlAccess,
+            disableFileAccess: this.mail.disableFileAccess,
+            normalizeHeaderKey: this.mail.normalizeHeaderKey,
+            newline: this.mail.newline,
+          });
       if (element.headers) {
         node.addHeader(element.headers);
       }
@@ -5959,7 +6324,8 @@ function requireMailComposer() {
       if (!/^text\//i.test(element.contentType) || element.contentDisposition) {
         node.setHeader(
           "Content-Disposition",
-          element.contentDisposition || (element.cid && /^image\//i.test(element.contentType) ? "inline" : "attachment")
+          element.contentDisposition ||
+            (element.cid && /^image\//i.test(element.contentType) ? "inline" : "attachment"),
         );
       }
       if (typeof element.content === "string" && !["utf8", "usascii", "ascii"].includes(encoding)) {
@@ -6000,7 +6366,7 @@ function requireMailComposer() {
           path: false,
           href: false,
           content: Buffer.alloc(0),
-          contentType: element.contentType || detectedType
+          contentType: element.contentType || detectedType,
         });
       }
       let parsedDataUri;
@@ -6079,7 +6445,7 @@ function requireMessageParser() {
         }
         if (chr === 10 && i) {
           const pr1 = i - 1 < lblen ? this.lastBytes[i - 1] : data[i - 1 - lblen];
-          const pr2 = i > 1 ? i - 2 < lblen ? this.lastBytes[i - 2] : data[i - 2 - lblen] : false;
+          const pr2 = i > 1 ? (i - 2 < lblen ? this.lastBytes[i - 2] : data[i - 2 - lblen]) : false;
           if (pr1 === 10) {
             this.headersParsed = true;
             headerPos = i - lblen + 1;
@@ -6146,10 +6512,12 @@ function requireMessageParser() {
           lines.splice(i, 1);
         }
       }
-      return lines.filter((line) => line.trim()).map((line) => ({
-        key: line.substr(0, line.indexOf(":")).trim().toLowerCase(),
-        line
-      }));
+      return lines
+        .filter((line) => line.trim())
+        .map((line) => ({
+          key: line.substr(0, line.indexOf(":")).trim().toLowerCase(),
+          line,
+        }));
     }
   }
   messageParser = MessageParser;
@@ -6180,10 +6548,10 @@ function requireRelaxedBody() {
       let state = "file";
       for (let i = chunk.length - 1; i >= 0; i--) {
         const c = chunk[i];
-        if (state === "file" && (c === 10 || c === 13)) ;
+        if (state === "file" && (c === 10 || c === 13));
         else if (state === "file" && (c === 9 || c === 32)) {
           state = "line";
-        } else if (state === "line" && (c === 9 || c === 32)) ;
+        } else if (state === "line" && (c === 9 || c === 32));
         else if (state === "file" || state === "line") {
           state = "body";
           if (i === chunk.length - 1) {
@@ -6191,7 +6559,10 @@ function requireRelaxedBody() {
           }
         }
         if (i === 0) {
-          if (state === "file" && (!this.remainder || /[\r\n]$/.test(this.remainder)) || state === "line" && (!this.remainder || /[ \t]$/.test(this.remainder))) {
+          if (
+            (state === "file" && (!this.remainder || /[\r\n]$/.test(this.remainder))) ||
+            (state === "line" && (!this.remainder || /[ \t]$/.test(this.remainder)))
+          ) {
             this.remainder += chunk.toString("binary");
             return;
           } else if (state === "line" || state === "file") {
@@ -6228,7 +6599,11 @@ function requireRelaxedBody() {
       if (needsFixing) {
         bodyStr = this.remainder + (chunk ? chunk.toString("binary") : "");
         this.remainder = nextRemainder;
-        bodyStr = bodyStr.replace(/\r?\n/g, "\n").replace(/[ \t]*$/gm, "").replace(/[ \t]+/gm, " ").replace(/\n/g, "\r\n");
+        bodyStr = bodyStr
+          .replace(/\r?\n/g, "\n")
+          .replace(/[ \t]*$/gm, "")
+          .replace(/[ \t]+/gm, " ")
+          .replace(/\n/g, "\r\n");
         chunk = Buffer.from(bodyStr, "binary");
       } else if (nextRemainder) {
         this.remainder = nextRemainder;
@@ -6257,7 +6632,11 @@ function requireRelaxedBody() {
       if (!this.byteLength) {
         this.push(Buffer.from("\r\n"));
       }
-      this.emit("hash", this.bodyHash.digest("base64"), this.debug ? Buffer.concat(this._debugBody) : false);
+      this.emit(
+        "hash",
+        this.bodyHash.digest("base64"),
+        this.debug ? Buffer.concat(this._debugBody) : false,
+      );
       callback();
     }
   }
@@ -6274,10 +6653,17 @@ function requireSign() {
   const crypto = require$$2$1;
   sign.exports = (headers, hashAlgo, bodyHash, options) => {
     options = options || {};
-    const defaultFieldNames = "From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive";
+    const defaultFieldNames =
+      "From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive";
     const fieldNames = options.headerFieldNames || defaultFieldNames;
     const canonicalizedHeaderData = relaxedHeaders(headers, fieldNames, options.skipFields);
-    const dkimHeader = generateDKIMHeader(options.domainName, options.keySelector, canonicalizedHeaderData.fieldNames, hashAlgo, bodyHash);
+    const dkimHeader = generateDKIMHeader(
+      options.domainName,
+      options.keySelector,
+      canonicalizedHeaderData.fieldNames,
+      hashAlgo,
+      bodyHash,
+    );
     canonicalizedHeaderData.headers += "dkim-signature:" + relaxedHeaderLine(dkimHeader);
     const signer = crypto.createSign(("rsa-" + hashAlgo).toUpperCase());
     signer.update(canonicalizedHeaderData.headers);
@@ -6299,7 +6685,7 @@ function requireSign() {
       "q=dns/txt",
       "s=" + keySelector,
       "bh=" + bodyHash,
-      "h=" + fieldNames
+      "h=" + fieldNames,
     ].join("; ");
     return mimeFuncs2.foldLines("DKIM-Signature: " + dkim2, 76) + ";\r\n b=";
   }
@@ -6307,12 +6693,19 @@ function requireSign() {
     const includedFields = /* @__PURE__ */ new Set();
     const skip = /* @__PURE__ */ new Set();
     const headerFields = /* @__PURE__ */ new Map();
-    (skipFields || "").toLowerCase().split(":").forEach((field) => {
-      skip.add(field.trim());
-    });
-    (fieldNames || "").toLowerCase().split(":").filter((field) => !skip.has(field.trim())).forEach((field) => {
-      includedFields.add(field.trim());
-    });
+    (skipFields || "")
+      .toLowerCase()
+      .split(":")
+      .forEach((field) => {
+        skip.add(field.trim());
+      });
+    (fieldNames || "")
+      .toLowerCase()
+      .split(":")
+      .filter((field) => !skip.has(field.trim()))
+      .forEach((field) => {
+        includedFields.add(field.trim());
+      });
     for (let i = headers.length - 1; i >= 0; i--) {
       const line = headers[i];
       if (includedFields.has(line.key) && !headerFields.has(line.key)) {
@@ -6329,11 +6722,15 @@ function requireSign() {
     });
     return {
       headers: headersList.join("\r\n") + "\r\n",
-      fieldNames: fields.join(":")
+      fieldNames: fields.join(":"),
     };
   }
   function relaxedHeaderLine(line) {
-    return line.substr(line.indexOf(":") + 1).replace(/\r?\n/g, "").replace(/\s+/g, " ").trim();
+    return line
+      .substr(line.indexOf(":") + 1)
+      .replace(/\r?\n/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
   }
   return sign.exports;
 }
@@ -6361,7 +6758,12 @@ function requireDkim() {
       this.chunks = [];
       this.chunklen = 0;
       this.readPos = 0;
-      this.cachePath = this.cacheDir ? path.join(this.cacheDir, "message." + Date.now() + "-" + crypto.randomBytes(14).toString("hex")) : false;
+      this.cachePath = this.cacheDir
+        ? path.join(
+            this.cacheDir,
+            "message." + Date.now() + "-" + crypto.randomBytes(14).toString("hex"),
+          )
+        : false;
       this.cache = false;
       this.headers = false;
       this.bodyHash = false;
@@ -6425,7 +6827,7 @@ function requireDkim() {
           keySelector: key.keySelector,
           privateKey: key.privateKey,
           headerFieldNames: this.options.headerFieldNames,
-          skipFields: this.options.skipFields
+          skipFields: this.options.skipFields,
         });
         if (dkimField) {
           this.output.write(Buffer.from(dkimField + "\r\n"));
@@ -6445,8 +6847,7 @@ function requireDkim() {
         this.cleanup();
         this.relaxedBody.unpipe(this.cache);
         this.relaxedBody.on("readable", () => {
-          while (this.relaxedBody.read() !== null) {
-          }
+          while (this.relaxedBody.read() !== null) {}
         });
         this.hasErrored = true;
         this.output.emit("error", err);
@@ -6460,7 +6861,7 @@ function requireDkim() {
     signStream() {
       this.parser = new MessageParser();
       this.relaxedBody = new RelaxedBody({
-        hashAlgo: this.hashAlgo
+        hashAlgo: this.hashAlgo,
       });
       this.parser.on("headers", (value) => {
         this.headers = value;
@@ -6498,8 +6899,8 @@ function requireDkim() {
         this.options.keys || {
           domainName: options.domainName,
           keySelector: options.keySelector,
-          privateKey: options.privateKey
-        }
+          privateKey: options.privateKey,
+        },
       );
     }
     sign(input, extraOptions) {
@@ -6545,7 +6946,7 @@ function requireHttpProxyClient() {
     const proxy = urllib.parse(proxyUrl);
     const options = {
       host: proxy.hostname,
-      port: Number(proxy.port) ? Number(proxy.port) : proxy.protocol === "https:" ? 443 : 80
+      port: Number(proxy.port) ? Number(proxy.port) : proxy.protocol === "https:" ? 443 : 80,
     };
     let connect;
     if (proxy.protocol === "https:") {
@@ -6563,8 +6964,7 @@ function requireHttpProxyClient() {
       finished = true;
       try {
         socket.destroy();
-      } catch (_E) {
-      }
+      } catch (_E) {}
       callback(err);
     };
     const timeoutErr = () => {
@@ -6578,16 +6978,22 @@ function requireHttpProxyClient() {
       }
       const reqHeaders = {
         Host: destinationHost + ":" + destinationPort,
-        Connection: "close"
+        Connection: "close",
       };
       if (proxy.auth) {
         reqHeaders["Proxy-Authorization"] = "Basic " + Buffer.from(proxy.auth).toString("base64");
       }
       socket.write(
         // HTTP method
-        "CONNECT " + destinationHost + ":" + destinationPort + " HTTP/1.1\r\n" + // HTTP request headers
-        Object.keys(reqHeaders).map((key) => key + ": " + reqHeaders[key]).join("\r\n") + // End request
-        "\r\n\r\n"
+        "CONNECT " +
+          destinationHost +
+          ":" +
+          destinationPort +
+          " HTTP/1.1\r\n" + // HTTP request headers
+          Object.keys(reqHeaders)
+            .map((key) => key + ": " + reqHeaders[key])
+            .join("\r\n") + // End request
+          "\r\n\r\n",
       );
       let headers = "";
       const onSocketData = (chunk) => {
@@ -6597,7 +7003,7 @@ function requireHttpProxyClient() {
           return;
         }
         headers += chunk.toString("binary");
-        if (match = headers.match(/\r\n\r\n/)) {
+        if ((match = headers.match(/\r\n\r\n/))) {
           socket.removeListener("data", onSocketData);
           remainder = headers.substr(match.index + match[0].length);
           headers = headers.substr(0, match.index);
@@ -6609,9 +7015,10 @@ function requireHttpProxyClient() {
           if (!match || (match[1] || "").charAt(0) !== "2") {
             try {
               socket.destroy();
-            } catch (_E) {
-            }
-            const err = new Error("Invalid response from proxy" + (match && ": " + match[1] || ""));
+            } catch (_E) {}
+            const err = new Error(
+              "Invalid response from proxy" + ((match && ": " + match[1]) || ""),
+            );
             err.code = errors2.EPROXY;
             return callback(err);
           }
@@ -6674,7 +7081,7 @@ function requireMailMessage() {
         [this.data, "text"],
         [this.data, "watchHtml"],
         [this.data, "amp"],
-        [this.data, "icalEvent"]
+        [this.data, "icalEvent"],
       ];
       if (this.data.alternatives && this.data.alternatives.length) {
         this.data.alternatives.forEach((alternative, i) => {
@@ -6684,13 +7091,17 @@ function requireMailMessage() {
       if (this.data.attachments && this.data.attachments.length) {
         this.data.attachments.forEach((attachment, i) => {
           if (!attachment.filename) {
-            attachment.filename = (attachment.path || attachment.href || "").split("/").pop().split("?").shift() || "attachment-" + (i + 1);
+            attachment.filename =
+              (attachment.path || attachment.href || "").split("/").pop().split("?").shift() ||
+              "attachment-" + (i + 1);
             if (attachment.filename.indexOf(".") < 0) {
               attachment.filename += "." + mimeFuncs2.detectExtension(attachment.contentType);
             }
           }
           if (!attachment.contentType) {
-            attachment.contentType = mimeFuncs2.detectMimeType(attachment.filename || attachment.path || attachment.href || "bin");
+            attachment.contentType = mimeFuncs2.detectMimeType(
+              attachment.filename || attachment.path || attachment.href || "bin",
+            );
           }
           keys.push([this.data.attachments, i]);
         });
@@ -6700,7 +7111,11 @@ function requireMailMessage() {
       addressKeys.forEach((address) => {
         let value;
         if (this.message) {
-          value = [].concat(mimeNode2._parseAddresses(this.message.getHeader(address === "replyTo" ? "reply-to" : address)) || []);
+          value = [].concat(
+            mimeNode2._parseAddresses(
+              this.message.getHeader(address === "replyTo" ? "reply-to" : address),
+            ) || [],
+          );
         } else if (this.data[address]) {
           value = [].concat(mimeNode2._parseAddresses(this.data[address]) || []);
         }
@@ -6727,15 +7142,22 @@ function requireMailMessage() {
         }
         shared2.resolveContent(
           ...args,
-          { disableFileAccess: this.data.disableFileAccess, disableUrlAccess: this.data.disableUrlAccess },
+          {
+            disableFileAccess: this.data.disableFileAccess,
+            disableUrlAccess: this.data.disableUrlAccess,
+          },
           (err, value) => {
             if (err) {
               return callback(err);
             }
             const node = {
-              content: value
+              content: value,
             };
-            if (args[0][args[1]] && typeof args[0][args[1]] === "object" && !Buffer.isBuffer(args[0][args[1]])) {
+            if (
+              args[0][args[1]] &&
+              typeof args[0][args[1]] === "object" &&
+              !Buffer.isBuffer(args[0][args[1]])
+            ) {
               Object.keys(args[0][args[1]]).forEach((key) => {
                 if (!(key in node) && !["content", "path", "href", "raw"].includes(key)) {
                   node[key] = args[0][args[1]][key];
@@ -6744,7 +7166,7 @@ function requireMailMessage() {
             }
             args[0][args[1]] = node;
             resolveNext();
-          }
+          },
         );
       };
       setImmediate(() => resolveNext());
@@ -6790,7 +7212,7 @@ function requireMailMessage() {
         data.normalizedHeaders = {};
         Object.keys(data.headers || {}).forEach((key) => {
           let value = [].concat(data.headers[key] || []).shift();
-          value = value && value.value || value;
+          value = (value && value.value) || value;
           if (value) {
             if (["references", "in-reply-to", "message-id", "content-id"].includes(key)) {
               value = this.message._encodeHeaderValue(key, value);
@@ -6801,14 +7223,22 @@ function requireMailMessage() {
         if (data.list && typeof data.list === "object") {
           const listHeaders = this._getListHeaders(data.list);
           listHeaders.forEach((entry) => {
-            data.normalizedHeaders[entry.key] = entry.value.map((val) => val && val.value || val).join(", ");
+            data.normalizedHeaders[entry.key] = entry.value
+              .map((val) => (val && val.value) || val)
+              .join(", ");
           });
         }
         if (data.references) {
-          data.normalizedHeaders.references = this.message._encodeHeaderValue("references", data.references);
+          data.normalizedHeaders.references = this.message._encodeHeaderValue(
+            "references",
+            data.references,
+          );
         }
         if (data.inReplyTo) {
-          data.normalizedHeaders["in-reply-to"] = this.message._encodeHeaderValue("in-reply-to", data.inReplyTo);
+          data.normalizedHeaders["in-reply-to"] = this.message._encodeHeaderValue(
+            "in-reply-to",
+            data.inReplyTo,
+          );
         }
         return callback(null, data);
       });
@@ -6852,31 +7282,40 @@ function requireMailMessage() {
         value: [].concat(listData[key] || []).map((value) => ({
           prepared: true,
           foldLines: true,
-          value: [].concat(value || []).map((value2) => {
-            if (typeof value2 === "string") {
-              value2 = {
-                url: value2
-              };
-            }
-            if (value2 && value2.url) {
-              if (key.toLowerCase().trim() === "id") {
-                let comment2 = (value2.comment || "").toString().replace(/\r?\n|\r/g, " ");
-                if (mimeFuncs2.isPlainText(comment2)) {
-                  comment2 = '"' + comment2 + '"';
-                } else {
-                  comment2 = mimeFuncs2.encodeWord(comment2);
+          value: []
+            .concat(value || [])
+            .map((value2) => {
+              if (typeof value2 === "string") {
+                value2 = {
+                  url: value2,
+                };
+              }
+              if (value2 && value2.url) {
+                if (key.toLowerCase().trim() === "id") {
+                  let comment2 = (value2.comment || "").toString().replace(/\r?\n|\r/g, " ");
+                  if (mimeFuncs2.isPlainText(comment2)) {
+                    comment2 = '"' + comment2 + '"';
+                  } else {
+                    comment2 = mimeFuncs2.encodeWord(comment2);
+                  }
+                  return (
+                    (value2.comment ? comment2 + " " : "") +
+                    this._formatListUrl(value2.url).replace(/^<[^:]+:\/{0,2}/, "<")
+                  );
                 }
-                return (value2.comment ? comment2 + " " : "") + this._formatListUrl(value2.url).replace(/^<[^:]+:\/{0,2}/, "<");
+                let comment = (value2.comment || "").toString().replace(/\r?\n|\r/g, " ");
+                if (!mimeFuncs2.isPlainText(comment)) {
+                  comment = mimeFuncs2.encodeWord(comment);
+                }
+                return (
+                  this._formatListUrl(value2.url) + (value2.comment ? " (" + comment + ")" : "")
+                );
               }
-              let comment = (value2.comment || "").toString().replace(/\r?\n|\r/g, " ");
-              if (!mimeFuncs2.isPlainText(comment)) {
-                comment = mimeFuncs2.encodeWord(comment);
-              }
-              return this._formatListUrl(value2.url) + (value2.comment ? " (" + comment + ")" : "");
-            }
-            return "";
-          }).filter((value2) => value2).join(", ")
-        }))
+              return "";
+            })
+            .filter((value2) => value2)
+            .join(", "),
+        })),
       }));
     }
     _formatListUrl(url) {
@@ -6919,45 +7358,45 @@ function requireMailer() {
       this._defaults = defaults || {};
       this._defaultPlugins = {
         compile: [(...args) => this._convertDataImages(...args)],
-        stream: []
+        stream: [],
       };
       this._userPlugins = {
         compile: [],
-        stream: []
+        stream: [],
       };
       this.meta = /* @__PURE__ */ new Map();
       this.dkim = this.options.dkim ? new DKIM(this.options.dkim) : false;
       this.transporter = transporter;
       this.transporter.mailer = this;
       this.logger = shared2.getLogger(this.options, {
-        component: this.options.component || "mail"
+        component: this.options.component || "mail",
       });
       this.logger.debug(
         {
-          tnx: "create"
+          tnx: "create",
         },
         "Creating transport: %s",
-        this.getVersionString()
+        this.getVersionString(),
       );
       if (typeof this.transporter.on === "function") {
         this.transporter.on("log", (log) => {
           this.logger.debug(
             {
-              tnx: "transport"
+              tnx: "transport",
             },
             "%s: %s",
             log.type,
-            log.message
+            log.message,
           );
         });
         this.transporter.on("error", (err) => {
           this.logger.error(
             {
               err,
-              tnx: "transport"
+              tnx: "transport",
             },
             "Transport Error: %s",
-            err.message
+            err.message,
           );
           this.emit("error", err);
         });
@@ -6980,10 +7419,10 @@ function requireMailer() {
           this.logger.warn(
             {
               tnx: "transport",
-              methodName: method
+              methodName: method,
             },
             "Non existing method %s called for transport",
-            method
+            method,
           );
           return false;
         };
@@ -7024,11 +7463,11 @@ function requireMailer() {
           tnx: "transport",
           name: this.transporter.name,
           version: this.transporter.version,
-          action: "send"
+          action: "send",
         },
         "Sending mail using %s/%s",
         this.transporter.name,
-        this.transporter.version
+        this.transporter.version,
       );
       this._processPlugins("compile", mail, (err) => {
         if (err) {
@@ -7036,10 +7475,10 @@ function requireMailer() {
             {
               err,
               tnx: "plugin",
-              action: "compile"
+              action: "compile",
             },
             "PluginCompile Error: %s",
-            err.message
+            err.message,
           );
           return callback(err);
         }
@@ -7053,10 +7492,10 @@ function requireMailer() {
               {
                 err: err2,
                 tnx: "plugin",
-                action: "stream"
+                action: "stream",
               },
               "PluginStream Error: %s",
-              err2.message
+              err2.message,
             );
             return callback(err2);
           }
@@ -7067,10 +7506,12 @@ function requireMailer() {
                 {
                   tnx: "DKIM",
                   messageId: mail.message.messageId(),
-                  dkimDomains: dkim2.keys.map((key) => key.keySelector + "." + key.domainName).join(", ")
+                  dkimDomains: dkim2.keys
+                    .map((key) => key.keySelector + "." + key.domainName)
+                    .join(", "),
                 },
                 "Signing outgoing message with %s keys",
-                dkim2.keys.length
+                dkim2.keys.length,
               );
               return dkim2.sign(input, mail.data._dkim);
             });
@@ -7081,10 +7522,10 @@ function requireMailer() {
                 {
                   err: args[0],
                   tnx: "transport",
-                  action: "send"
+                  action: "send",
                 },
                 "Send Error: %s",
-                args[0].message
+                args[0].message,
               );
             }
             callback(...args);
@@ -7100,7 +7541,7 @@ function requireMailer() {
         packageData.version,
         packageData.homepage,
         this.transporter.name,
-        this.transporter.version
+        this.transporter.version,
       );
     }
     _processPlugins(step, mail, callback) {
@@ -7115,11 +7556,11 @@ function requireMailer() {
           {
             tnx: "transaction",
             pluginCount: userPlugins.length,
-            step
+            step,
           },
           "Using %s plugins for %s",
           userPlugins.length,
-          step
+          step,
         );
       }
       if (userPlugins.length + defaultPlugins.length === 0) {
@@ -7169,7 +7610,7 @@ function requireMailer() {
                 return callback(err2);
               }
               return callback(null, {
-                connection: socket
+                connection: socket,
               });
             });
             return;
@@ -7184,19 +7625,21 @@ function requireMailer() {
             }
             const connect = (ipaddress) => {
               const proxyV2 = !!this.meta.get("proxy_socks_module").SocksClient;
-              const socksClient = proxyV2 ? this.meta.get("proxy_socks_module").SocksClient : this.meta.get("proxy_socks_module");
+              const socksClient = proxyV2
+                ? this.meta.get("proxy_socks_module").SocksClient
+                : this.meta.get("proxy_socks_module");
               const proxyType = Number(proxy.protocol.replace(/\D/g, "")) || 5;
               const connectionOpts = {
                 proxy: {
                   ipaddress,
                   port: Number(proxy.port),
-                  type: proxyType
+                  type: proxyType,
                 },
                 [proxyV2 ? "destination" : "target"]: {
                   host: options.host,
-                  port: options.port
+                  port: options.port,
                 },
-                command: "connect"
+                command: "connect",
               };
               if (proxy.auth) {
                 const username = decodeURIComponent(proxy.auth.split(":").shift());
@@ -7209,7 +7652,7 @@ function requireMailer() {
                 } else {
                   connectionOpts.authentication = {
                     username,
-                    password
+                    password,
                   };
                 }
               }
@@ -7218,7 +7661,7 @@ function requireMailer() {
                   return callback(err2);
                 }
                 return callback(null, {
-                  connection: info.socket || info
+                  connection: info.socket || info,
                 });
               });
             };
@@ -7239,39 +7682,44 @@ function requireMailer() {
       };
     }
     _convertDataImages(mail, callback) {
-      if (!this.options.attachDataUrls && !mail.data.attachDataUrls || !mail.data.html) {
+      if ((!this.options.attachDataUrls && !mail.data.attachDataUrls) || !mail.data.html) {
         return callback();
       }
       mail.resolveContent(
         mail.data,
         "html",
-        { disableFileAccess: mail.data.disableFileAccess, disableUrlAccess: mail.data.disableUrlAccess },
+        {
+          disableFileAccess: mail.data.disableFileAccess,
+          disableUrlAccess: mail.data.disableUrlAccess,
+        },
         (err, html) => {
           if (err) {
             return callback(err);
           }
           let cidCounter = 0;
-          html = (html || "").toString().replace(
-            /(<img\b[^<>]{0,1024} src\s{0,20}=[\s"']{0,20})(data:([^;]+);[^"'>\s]+)/gi,
-            (match, prefix, dataUri, mimeType) => {
-              const cid = crypto.randomBytes(10).toString("hex") + "@localhost";
-              if (!mail.data.attachments) {
-                mail.data.attachments = [];
-              }
-              if (!Array.isArray(mail.data.attachments)) {
-                mail.data.attachments = [].concat(mail.data.attachments || []);
-              }
-              mail.data.attachments.push({
-                path: dataUri,
-                cid,
-                filename: "image-" + ++cidCounter + "." + mimeTypes.detectExtension(mimeType)
-              });
-              return prefix + "cid:" + cid;
-            }
-          );
+          html = (html || "")
+            .toString()
+            .replace(
+              /(<img\b[^<>]{0,1024} src\s{0,20}=[\s"']{0,20})(data:([^;]+);[^"'>\s]+)/gi,
+              (match, prefix, dataUri, mimeType) => {
+                const cid = crypto.randomBytes(10).toString("hex") + "@localhost";
+                if (!mail.data.attachments) {
+                  mail.data.attachments = [];
+                }
+                if (!Array.isArray(mail.data.attachments)) {
+                  mail.data.attachments = [].concat(mail.data.attachments || []);
+                }
+                mail.data.attachments.push({
+                  path: dataUri,
+                  cid,
+                  filename: "image-" + ++cidCounter + "." + mimeTypes.detectExtension(mimeType),
+                });
+                return prefix + "cid:" + cid;
+              },
+            );
           mail.data.html = html;
           callback();
-        }
+        },
       );
     }
     set(key, value) {
@@ -7304,7 +7752,9 @@ function requireDataStream() {
     _transform(chunk, encoding, done) {
       const chunks = [];
       let chunklen = 0;
-      let i, len, lastPos = 0;
+      let i,
+        len,
+        lastPos = 0;
       let buf;
       if (!chunk || !chunk.length) {
         return done();
@@ -7315,7 +7765,7 @@ function requireDataStream() {
       this.inByteCount += chunk.length;
       for (i = 0, len = chunk.length; i < len; i++) {
         if (chunk[i] === 46) {
-          if (i && chunk[i - 1] === 10 || !i && (!this.lastByte || this.lastByte === 10)) {
+          if ((i && chunk[i - 1] === 10) || (!i && (!this.lastByte || this.lastByte === 10))) {
             buf = chunk.slice(lastPos, i + 1);
             chunks.push(buf);
             chunks.push(Buffer.from("."));
@@ -7323,7 +7773,7 @@ function requireDataStream() {
             lastPos = i + 1;
           }
         } else if (chunk[i] === 10) {
-          if (i && chunk[i - 1] !== 13 || !i && this.lastByte !== 13) {
+          if ((i && chunk[i - 1] !== 13) || (!i && this.lastByte !== 13)) {
             if (i > lastPos) {
               buf = chunk.slice(lastPos, i);
               chunks.push(buf);
@@ -7389,8 +7839,7 @@ function requireSmtpConnection() {
   const SOCKET_TIMEOUT = 10 * 60 * 1e3;
   const GREETING_TIMEOUT = 30 * 1e3;
   const DNS_TIMEOUT = 30 * 1e3;
-  const TEARDOWN_NOOP = () => {
-  };
+  const TEARDOWN_NOOP = () => {};
   function decodeServerResponse(str) {
     if (!str) {
       return str;
@@ -7408,7 +7857,11 @@ function requireSmtpConnection() {
       this.alreadySecured = !!this.options.secured;
       this.port = Number(this.options.port) || (this.secureConnection ? 465 : 587);
       this.host = this.options.host || "localhost";
-      this.servername = this.options.servername ? this.options.servername : !net.isIP(this.host) ? this.host : false;
+      this.servername = this.options.servername
+        ? this.options.servername
+        : !net.isIP(this.host)
+          ? this.host
+          : false;
       this.allowInternalNetworkInterfaces = this.options.allowInternalNetworkInterfaces || false;
       if (typeof this.options.secure === "undefined" && this.port === 465) {
         this.secureConnection = true;
@@ -7416,7 +7869,7 @@ function requireSmtpConnection() {
       this.name = (this.options.name || this._getHostname()).toString().replace(/[\r\n]+/g, "");
       this.logger = shared2.getLogger(this.options, {
         component: this.options.component || "smtp-connection",
-        sid: this.id
+        sid: this.id,
       });
       this.customAuth = /* @__PURE__ */ new Map();
       for (const key of Object.keys(this.options.customAuth || {})) {
@@ -7462,22 +7915,24 @@ function requireSmtpConnection() {
         this.once("connect", () => {
           this.logger.debug(
             {
-              tnx: "smtp"
+              tnx: "smtp",
             },
-            "SMTP handshake finished"
+            "SMTP handshake finished",
           );
           connectCallback();
         });
         const isDestroyedMessage = this._isDestroyedMessage("connect");
         if (isDestroyedMessage) {
-          return connectCallback(this._formatError(isDestroyedMessage, "ECONNECTION", false, "CONN"));
+          return connectCallback(
+            this._formatError(isDestroyedMessage, "ECONNECTION", false, "CONN"),
+          );
         }
       }
       let opts = {
         port: this.port,
         host: this.host,
         allowInternalNetworkInterfaces: this.allowInternalNetworkInterfaces,
-        timeout: this.options.dnsTimeout || DNS_TIMEOUT
+        timeout: this.options.dnsTimeout || DNS_TIMEOUT,
       };
       if (this.options.localAddress) {
         opts.localAddress = this.options.localAddress;
@@ -7486,14 +7941,19 @@ function requireSmtpConnection() {
         this._socket = this.options.connection;
         this._setupConnectionHandlers();
         if (this.secureConnection && !this.alreadySecured) {
-          setImmediate(
-            () => this._upgradeConnection((err) => {
+          setImmediate(() =>
+            this._upgradeConnection((err) => {
               if (err) {
-                this._onError(new Error("Error initiating TLS - " + (err.message || err)), "ETLS", false, "CONN");
+                this._onError(
+                  new Error("Error initiating TLS - " + (err.message || err)),
+                  "ETLS",
+                  false,
+                  "CONN",
+                );
                 return;
               }
               this._onConnect();
-            })
+            }),
           );
         } else {
           setImmediate(() => this._onConnect());
@@ -7520,7 +7980,9 @@ function requireSmtpConnection() {
           }
         }
         return this._resolveAndConnect(opts, (resolved) => {
-          this._fallbackAddresses = (resolved._addresses || []).filter((addr) => addr !== opts.host);
+          this._fallbackAddresses = (resolved._addresses || []).filter(
+            (addr) => addr !== opts.host,
+          );
           this._connectOpts = Object.assign({}, opts);
           this._connectToHost(opts, this.secureConnection);
         });
@@ -7543,12 +8005,12 @@ function requireSmtpConnection() {
             tnx: "dns",
             source: opts.host,
             resolved: resolved.host,
-            cached: !!resolved.cached
+            cached: !!resolved.cached,
           },
           "Resolved %s as %s [cache %s]",
           opts.host,
           resolved.host,
-          resolved.cached ? "hit" : "miss"
+          resolved.cached ? "hit" : "miss",
         );
         for (const key of Object.keys(resolved)) {
           if (key.charAt(0) !== "_" && resolved[key]) {
@@ -7598,7 +8060,11 @@ function requireSmtpConnection() {
      */
     _onConnectionError(err, code) {
       clearTimeout(this._connectionTimeout);
-      const canFallback = this._fallbackAddresses && this._fallbackAddresses.length && this.stage === "init" && !this._destroyed;
+      const canFallback =
+        this._fallbackAddresses &&
+        this._fallbackAddresses.length &&
+        this.stage === "init" &&
+        !this._destroyed;
       if (!canFallback) {
         this._onError(err, code, false, "CONN");
         return;
@@ -7609,18 +8075,17 @@ function requireSmtpConnection() {
           tnx: "network",
           failedHost: this._connectOpts.host,
           nextHost,
-          error: err.message || err
+          error: err.message || err,
         },
         "Connection to %s failed, trying %s",
         this._connectOpts.host,
-        nextHost
+        nextHost,
       );
       if (this._socket) {
         try {
           this._socket.removeListener("error", this._onConnectionSocketError);
           this._socket.destroy();
-        } catch (_E) {
-        }
+        } catch (_E) {}
         this._socket = null;
       }
       this._connectOpts.host = nextHost;
@@ -7647,17 +8112,16 @@ function requireSmtpConnection() {
       const closeMethod = this.stage === "init" ? "destroy" : "end";
       this.logger.debug(
         {
-          tnx: "smtp"
+          tnx: "smtp",
         },
         'Closing connection to the server using "%s"',
-        closeMethod
+        closeMethod,
       );
-      const socket = this._socket && this._socket.socket || this._socket;
+      const socket = (this._socket && this._socket.socket) || this._socket;
       if (this._currentDataStream) {
         try {
           this._currentDataStream.unpipe(this._socket);
-        } catch (_E) {
-        }
+        } catch (_E) {}
         this._currentDataStream = false;
       }
       if (socket && !socket.destroyed) {
@@ -7671,8 +8135,7 @@ function requireSmtpConnection() {
           socket.removeListener("error", this._onConnectionSocketError);
           socket.on("error", TEARDOWN_NOOP);
           socket[closeMethod]();
-        } catch (_E) {
-        }
+        } catch (_E) {}
       }
       this._destroy();
     }
@@ -7688,18 +8151,28 @@ function requireSmtpConnection() {
       this._authMethod = (this._auth.method || "").toString().trim().toUpperCase() || false;
       if (!this._authMethod && this._auth.oauth2 && !this._auth.credentials) {
         this._authMethod = "XOAUTH2";
-      } else if (!this._authMethod || this._authMethod === "XOAUTH2" && !this._auth.oauth2) {
+      } else if (!this._authMethod || (this._authMethod === "XOAUTH2" && !this._auth.oauth2)) {
         this._authMethod = (this._supportedAuth[0] || "PLAIN").toUpperCase().trim();
       }
-      if (this._authMethod !== "XOAUTH2" && (!this._auth.credentials || !this._auth.credentials.user || !this._auth.credentials.pass)) {
-        if (this._auth.user && this._auth.pass || this.customAuth.has(this._authMethod)) {
+      if (
+        this._authMethod !== "XOAUTH2" &&
+        (!this._auth.credentials || !this._auth.credentials.user || !this._auth.credentials.pass)
+      ) {
+        if ((this._auth.user && this._auth.pass) || this.customAuth.has(this._authMethod)) {
           this._auth.credentials = {
             user: this._auth.user,
             pass: this._auth.pass,
-            options: this._auth.options
+            options: this._auth.options,
           };
         } else {
-          return callback(this._formatError('Missing credentials for "' + this._authMethod + '"', "EAUTH", false, "API"));
+          return callback(
+            this._formatError(
+              'Missing credentials for "' + this._authMethod + '"',
+              "EAUTH",
+              false,
+              "API",
+            ),
+          );
         }
       }
       if (this.customAuth.has(this._authMethod)) {
@@ -7716,10 +8189,10 @@ function requireSmtpConnection() {
               tnx: "smtp",
               username: this._auth.user,
               action: "authenticated",
-              method: this._authMethod
+              method: this._authMethod,
             },
             "User %s authenticated",
-            JSON.stringify(this._auth.user)
+            JSON.stringify(this._auth.user),
           );
           this.authenticated = true;
           callback(null, true);
@@ -7749,7 +8222,7 @@ function requireSmtpConnection() {
               let codes = str.match(/^(\d+)(?:\s(\d+\.\d+\.\d+))?\s/);
               let data = {
                 command: cmd,
-                response: str
+                response: str,
               };
               if (codes) {
                 data.status = Number(codes[1]) || 0;
@@ -7767,7 +8240,7 @@ function requireSmtpConnection() {
             return promise;
           },
           resolve,
-          reject
+          reject,
         });
         if (handlerResponse && typeof handlerResponse.catch === "function") {
           handlerResponse.then(resolve).catch(reject);
@@ -7789,19 +8262,24 @@ function requireSmtpConnection() {
             this._actionAUTHComplete(str, callback);
           });
           this._sendCommand(
-            "AUTH PLAIN " + Buffer.from(
-              //this._auth.user+'\u0000'+
-              "\0" + // skip authorization identity as it causes problems with some servers
-              this._auth.credentials.user + "\0" + this._auth.credentials.pass,
-              "utf-8"
-            ).toString("base64"),
+            "AUTH PLAIN " +
+              Buffer.from(
+                //this._auth.user+'\u0000'+
+                "\0" + // skip authorization identity as it causes problems with some servers
+                  this._auth.credentials.user +
+                  "\0" +
+                  this._auth.credentials.pass,
+                "utf-8",
+              ).toString("base64"),
             // log entry without passwords
-            "AUTH PLAIN " + Buffer.from(
-              //this._auth.user+'\u0000'+
-              "\0" + // skip authorization identity as it causes problems with some servers
-              this._auth.credentials.user + "\0/* secret */",
-              "utf-8"
-            ).toString("base64")
+            "AUTH PLAIN " +
+              Buffer.from(
+                //this._auth.user+'\u0000'+
+                "\0" + // skip authorization identity as it causes problems with some servers
+                  this._auth.credentials.user +
+                  "\0/* secret */",
+                "utf-8",
+              ).toString("base64"),
           );
           return;
         case "CRAM-MD5":
@@ -7811,7 +8289,14 @@ function requireSmtpConnection() {
           this._sendCommand("AUTH CRAM-MD5");
           return;
       }
-      return callback(this._formatError('Unknown authentication method "' + this._authMethod + '"', "EAUTH", false, "API"));
+      return callback(
+        this._formatError(
+          'Unknown authentication method "' + this._authMethod + '"',
+          "EAUTH",
+          false,
+          "API",
+        ),
+      );
     }
     /**
      * Sends a message
@@ -7830,11 +8315,18 @@ function requireSmtpConnection() {
       }
       if (this._maxAllowedSize && envelope.size > this._maxAllowedSize) {
         return setImmediate(() => {
-          done(this._formatError("Message size larger than allowed " + this._maxAllowedSize, "EMESSAGE", false, "MAIL FROM"));
+          done(
+            this._formatError(
+              "Message size larger than allowed " + this._maxAllowedSize,
+              "EMESSAGE",
+              false,
+              "MAIL FROM",
+            ),
+          );
         });
       }
       let returned = false;
-      const callback = function() {
+      const callback = function () {
         if (returned) {
           return;
         }
@@ -7884,7 +8376,14 @@ function requireSmtpConnection() {
       this._sendCommand("RSET");
       this._responseActions.push((str) => {
         if (str.charAt(0) !== "2") {
-          return callback(this._formatError("Could not reset session state. response=" + str, "EPROTOCOL", str, "RSET"));
+          return callback(
+            this._formatError(
+              "Could not reset session state. response=" + str,
+              "EPROTOCOL",
+              str,
+              "RSET",
+            ),
+          );
         }
         this._envelope = false;
         return callback(null, true);
@@ -7904,12 +8403,12 @@ function requireSmtpConnection() {
           localAddress: this._socket.localAddress,
           localPort: this._socket.localPort,
           remoteAddress: this._socket.remoteAddress,
-          remotePort: this._socket.remotePort
+          remotePort: this._socket.remotePort,
         },
         "%s established to %s:%s",
         this.secure ? "Secure connection" : "Connection",
         this._socket.remoteAddress,
-        this._socket.remotePort
+        this._socket.remotePort,
       );
       if (this._destroyed) {
         this.close();
@@ -8004,7 +8503,8 @@ function requireSmtpConnection() {
         err.response = response;
         err.message += ": " + response;
       }
-      const responseCode = typeof response === "string" && Number((response.match(/^\d+/) || [])[0]) || false;
+      const responseCode =
+        (typeof response === "string" && Number((response.match(/^\d+/) || [])[0])) || false;
       if (responseCode) {
         err.responseCode = responseCode;
       }
@@ -8025,24 +8525,42 @@ function requireSmtpConnection() {
         if (this.options.debug || this.options.transactionLog) {
           this.logger.debug(
             {
-              tnx: "server"
+              tnx: "server",
             },
-            serverResponse
+            serverResponse,
           );
         }
       }
       this.logger.info(
         {
-          tnx: "network"
+          tnx: "network",
         },
-        "Connection closed"
+        "Connection closed",
       );
       if (this.upgrading && !this._destroyed) {
-        return this._onError(new Error("Connection closed unexpectedly"), "ETLS", serverResponse, "CONN");
-      } else if (![this._actionGreeting, this.close].includes(this._responseActions[0]) && !this._destroyed) {
-        return this._onError(new Error("Connection closed unexpectedly"), "ECONNECTION", serverResponse, "CONN");
+        return this._onError(
+          new Error("Connection closed unexpectedly"),
+          "ETLS",
+          serverResponse,
+          "CONN",
+        );
+      } else if (
+        ![this._actionGreeting, this.close].includes(this._responseActions[0]) &&
+        !this._destroyed
+      ) {
+        return this._onError(
+          new Error("Connection closed unexpectedly"),
+          "ECONNECTION",
+          serverResponse,
+          "CONN",
+        );
       } else if (/^[45]\d{2}\b/.test(serverResponse)) {
-        return this._onError(new Error("Connection closed unexpectedly"), "ECONNECTION", serverResponse, "CONN");
+        return this._onError(
+          new Error("Connection closed unexpectedly"),
+          "ECONNECTION",
+          serverResponse,
+          "CONN",
+        );
       }
       this._destroy();
     }
@@ -8087,9 +8605,9 @@ function requireSmtpConnection() {
       const opts = Object.assign(
         {
           socket: this._socket,
-          host: this.host
+          host: this.host,
         },
-        this.options.tls || {}
+        this.options.tls || {},
       );
       if (this.servername && !opts.servername) {
         opts.servername = this.servername;
@@ -8128,16 +8646,18 @@ function requireSmtpConnection() {
       if (!this._responseQueue.length) {
         return false;
       }
-      let str = this.lastServerResponse = decodeServerResponse((this._responseQueue.shift() || "").toString());
+      let str = (this.lastServerResponse = decodeServerResponse(
+        (this._responseQueue.shift() || "").toString(),
+      ));
       if (/^\d+-/.test(str.split("\n").pop())) {
         return;
       }
       if (this.options.debug || this.options.transactionLog) {
         this.logger.debug(
           {
-            tnx: "server"
+            tnx: "server",
           },
-          str.replace(/\r?\n$/, "")
+          str.replace(/\r?\n$/, ""),
         );
       }
       if (!str.trim()) {
@@ -8167,9 +8687,9 @@ function requireSmtpConnection() {
       if (this.options.debug || this.options.transactionLog) {
         this.logger.debug(
           {
-            tnx: "client"
+            tnx: "client",
           },
-          (logStr || str || "").toString().replace(/\r?\n$/, "")
+          (logStr || str || "").toString().replace(/\r?\n$/, ""),
         );
       }
       this._socket.write(Buffer.from(str + "\r\n", "utf-8"));
@@ -8187,20 +8707,42 @@ function requireSmtpConnection() {
       const args = [];
       let useSmtpUtf8 = false;
       this._envelope = envelope || {};
-      this._envelope.from = (this._envelope.from && this._envelope.from.address || this._envelope.from || "").toString().trim();
-      this._envelope.to = [].concat(this._envelope.to || []).map((to) => (to && to.address || to || "").toString().trim());
+      this._envelope.from = (
+        (this._envelope.from && this._envelope.from.address) ||
+        this._envelope.from ||
+        ""
+      )
+        .toString()
+        .trim();
+      this._envelope.to = []
+        .concat(this._envelope.to || [])
+        .map((to) => ((to && to.address) || to || "").toString().trim());
       if (!this._envelope.to.length) {
         return callback(this._formatError("No recipients defined", "EENVELOPE", false, "API"));
       }
       if (this._envelope.from && /[\r\n<>]/.test(this._envelope.from)) {
-        return callback(this._formatError("Invalid sender " + JSON.stringify(this._envelope.from), "EENVELOPE", false, "API"));
+        return callback(
+          this._formatError(
+            "Invalid sender " + JSON.stringify(this._envelope.from),
+            "EENVELOPE",
+            false,
+            "API",
+          ),
+        );
       }
       if (/[\x80-\uFFFF]/.test(this._envelope.from)) {
         useSmtpUtf8 = true;
       }
       for (let i = 0, len = this._envelope.to.length; i < len; i++) {
         if (!this._envelope.to[i] || /[\r\n<>]/.test(this._envelope.to[i])) {
-          return callback(this._formatError("Invalid recipient " + JSON.stringify(this._envelope.to[i]), "EENVELOPE", false, "API"));
+          return callback(
+            this._formatError(
+              "Invalid recipient " + JSON.stringify(this._envelope.to[i]),
+              "EENVELOPE",
+              false,
+              "API",
+            ),
+          );
         }
         if (/[\x80-\uFFFF]/.test(this._envelope.to[i])) {
           useSmtpUtf8 = true;
@@ -8214,7 +8756,9 @@ function requireSmtpConnection() {
         try {
           this._envelope.dsn = this._setDsnEnvelope(this._envelope.dsn);
         } catch (err) {
-          return callback(this._formatError("Invalid DSN " + err.message, "EENVELOPE", false, "API"));
+          return callback(
+            this._formatError("Invalid DSN " + err.message, "EENVELOPE", false, "API"),
+          );
         }
       }
       this._responseActions.push((str) => {
@@ -8245,17 +8789,29 @@ function requireSmtpConnection() {
       if (this._envelope.requireTLSExtensionEnabled) {
         if (!this.secure) {
           return callback(
-            this._formatError("REQUIRETLS can only be used over TLS connections (RFC 8689)", "EREQUIRETLS", false, "MAIL FROM")
+            this._formatError(
+              "REQUIRETLS can only be used over TLS connections (RFC 8689)",
+              "EREQUIRETLS",
+              false,
+              "MAIL FROM",
+            ),
           );
         }
         if (!this._supportedExtensions.includes("REQUIRETLS")) {
           return callback(
-            this._formatError("Server does not support REQUIRETLS extension (RFC 8689)", "EREQUIRETLS", false, "MAIL FROM")
+            this._formatError(
+              "Server does not support REQUIRETLS extension (RFC 8689)",
+              "EREQUIRETLS",
+              false,
+              "MAIL FROM",
+            ),
           );
         }
         args.push("REQUIRETLS");
       }
-      this._sendCommand("MAIL FROM:<" + this._envelope.from + ">" + (args.length ? " " + args.join(" ") : ""));
+      this._sendCommand(
+        "MAIL FROM:<" + this._envelope.from + ">" + (args.length ? " " + args.join(" ") : ""),
+      );
     }
     _setDsnEnvelope(params) {
       let ret = (params.ret || params.return || "").toString().toUpperCase() || null;
@@ -8283,7 +8839,7 @@ function requireSmtpConnection() {
         notify = notify.map((n) => n.trim().toUpperCase());
         const validNotify = ["NEVER", "SUCCESS", "FAILURE", "DELAY"];
         const invalidNotify = notify.filter((n) => !validNotify.includes(n));
-        if (invalidNotify.length || notify.length > 1 && notify.includes("NEVER")) {
+        if (invalidNotify.length || (notify.length > 1 && notify.includes("NEVER"))) {
           throw new Error("notify: " + JSON.stringify(notify.join(",")));
         }
         notify = notify.join(",");
@@ -8296,7 +8852,7 @@ function requireSmtpConnection() {
         ret,
         envid,
         notify,
-        orcpt
+        orcpt,
       };
     }
     _getDsnRcptToArgs() {
@@ -8327,18 +8883,18 @@ function requireSmtpConnection() {
       }
       this._currentDataStream = dataStream2;
       dataStream2.pipe(this._socket, {
-        end: false
+        end: false,
       });
       if (this.options.debug) {
         const logStream = new PassThrough();
         logStream.on("readable", () => {
           let chunk;
-          while (chunk = logStream.read()) {
+          while ((chunk = logStream.read())) {
             this.logger.debug(
               {
-                tnx: "message"
+                tnx: "message",
               },
-              chunk.toString("binary").replace(/\r?\n$/, "")
+              chunk.toString("binary").replace(/\r?\n$/, ""),
             );
           }
         });
@@ -8352,11 +8908,11 @@ function requireSmtpConnection() {
           {
             tnx: "message",
             inByteCount: dataStream2.inByteCount,
-            outByteCount: dataStream2.outByteCount
+            outByteCount: dataStream2.outByteCount,
           },
           "<%s bytes encoded mime message (source size %s bytes)>",
           dataStream2.outByteCount,
-          dataStream2.inByteCount
+          dataStream2.inByteCount,
         );
       });
       return dataStream2;
@@ -8407,7 +8963,12 @@ function requireSmtpConnection() {
     _actionEHLO(str) {
       let match;
       if (str.substr(0, 3) === "421") {
-        this._onError(new Error("Server terminates connection. response=" + str), "ECONNECTION", str, "EHLO");
+        this._onError(
+          new Error("Server terminates connection. response=" + str),
+          "ECONNECTION",
+          str,
+          "EHLO",
+        );
         return;
       }
       if (str.charAt(0) !== "2") {
@@ -8416,7 +8977,7 @@ function requireSmtpConnection() {
             new Error("EHLO failed but HELO does not support required STARTTLS. response=" + str),
             "ECONNECTION",
             str,
-            "EHLO"
+            "EHLO",
           );
           return;
         }
@@ -8424,8 +8985,16 @@ function requireSmtpConnection() {
         this._sendCommand("HELO " + this.name);
         return;
       }
-      this._ehloLines = str.split(/\r?\n/).map((line) => line.replace(/^\d+[ -]/, "").trim()).filter((line) => line).slice(1);
-      if (!this.secure && !this.options.ignoreTLS && (/[ -]STARTTLS\b/im.test(str) || this.options.requireTLS)) {
+      this._ehloLines = str
+        .split(/\r?\n/)
+        .map((line) => line.replace(/^\d+[ -]/, "").trim())
+        .filter((line) => line)
+        .slice(1);
+      if (
+        !this.secure &&
+        !this.options.ignoreTLS &&
+        (/[ -]STARTTLS\b/im.test(str) || this.options.requireTLS)
+      ) {
         this._sendCommand("STARTTLS");
         this._responseActions.push(this._actionSTARTTLS);
         return;
@@ -8460,7 +9029,7 @@ function requireSmtpConnection() {
       if (/[ -]AUTH(?:(\s+|=)[^\n]*\s+|\s+|=)XOAUTH2/i.test(str)) {
         this._supportedAuth.push("XOAUTH2");
       }
-      if (match = str.match(/[ -]SIZE(?:[ \t]+(\d+))?/im)) {
+      if ((match = str.match(/[ -]SIZE(?:[ \t]+(\d+))?/im))) {
         this._supportedExtensions.push("SIZE");
         this._maxAllowedSize = Number(match[1]) || 0;
       }
@@ -8492,25 +9061,35 @@ function requireSmtpConnection() {
         if (this.options.opportunisticTLS) {
           this.logger.info(
             {
-              tnx: "smtp"
+              tnx: "smtp",
             },
-            "Failed STARTTLS upgrade, continuing unencrypted"
+            "Failed STARTTLS upgrade, continuing unencrypted",
           );
           return this.emit("connect");
         }
-        this._onError(new Error("Error upgrading connection with STARTTLS"), "ETLS", str, "STARTTLS");
+        this._onError(
+          new Error("Error upgrading connection with STARTTLS"),
+          "ETLS",
+          str,
+          "STARTTLS",
+        );
         return;
       }
       this._upgradeConnection((err, secured) => {
         if (err) {
-          this._onError(new Error("Error initiating TLS - " + (err.message || err)), "ETLS", false, "STARTTLS");
+          this._onError(
+            new Error("Error initiating TLS - " + (err.message || err)),
+            "ETLS",
+            false,
+            "STARTTLS",
+          );
           return;
         }
         this.logger.info(
           {
-            tnx: "smtp"
+            tnx: "smtp",
           },
-          "Connection upgraded with STARTTLS"
+          "Connection upgraded with STARTTLS",
         );
         if (secured) {
           if (this.options.lmtp) {
@@ -8536,7 +9115,14 @@ function requireSmtpConnection() {
      */
     _actionAUTH_LOGIN_USER(str, callback) {
       if (!/^334[ -]/.test(str)) {
-        callback(this._formatError('Invalid login sequence while waiting for "334 VXNlcm5hbWU6"', "EAUTH", str, "AUTH LOGIN"));
+        callback(
+          this._formatError(
+            'Invalid login sequence while waiting for "334 VXNlcm5hbWU6"',
+            "EAUTH",
+            str,
+            "AUTH LOGIN",
+          ),
+        );
         return;
       }
       this._responseActions.push((str2) => {
@@ -8557,7 +9143,12 @@ function requireSmtpConnection() {
       const challengeMatch = str.match(/^334\s+(.+)$/);
       if (!challengeMatch) {
         return callback(
-          this._formatError("Invalid login sequence while waiting for server challenge string", "EAUTH", str, "AUTH CRAM-MD5")
+          this._formatError(
+            "Invalid login sequence while waiting for server challenge string",
+            "EAUTH",
+            str,
+            "AUTH CRAM-MD5",
+          ),
         );
       }
       const base64decoded = Buffer.from(challengeMatch[1], "base64").toString("ascii");
@@ -8570,7 +9161,7 @@ function requireSmtpConnection() {
       this._sendCommand(
         Buffer.from(prepended).toString("base64"),
         // hidden hash for logs
-        Buffer.from(this._auth.credentials.user + " /* secret */").toString("base64")
+        Buffer.from(this._auth.credentials.user + " /* secret */").toString("base64"),
       );
     }
     /**
@@ -8581,17 +9172,24 @@ function requireSmtpConnection() {
      */
     _actionAUTH_CRAM_MD5_PASS(str, callback) {
       if (!str.match(/^235\s+/)) {
-        return callback(this._formatError('Invalid login sequence while waiting for "235"', "EAUTH", str, "AUTH CRAM-MD5"));
+        return callback(
+          this._formatError(
+            'Invalid login sequence while waiting for "235"',
+            "EAUTH",
+            str,
+            "AUTH CRAM-MD5",
+          ),
+        );
       }
       this.logger.info(
         {
           tnx: "smtp",
           username: this._auth.user,
           action: "authenticated",
-          method: this._authMethod
+          method: this._authMethod,
         },
         "User %s authenticated",
-        JSON.stringify(this._auth.user)
+        JSON.stringify(this._auth.user),
       );
       this.authenticated = true;
       callback(null, true);
@@ -8605,7 +9203,14 @@ function requireSmtpConnection() {
      */
     _actionAUTH_LOGIN_PASS(str, callback) {
       if (!/^334[ -]/.test(str)) {
-        return callback(this._formatError('Invalid login sequence while waiting for "334 UGFzc3dvcmQ6"', "EAUTH", str, "AUTH LOGIN"));
+        return callback(
+          this._formatError(
+            'Invalid login sequence while waiting for "334 UGFzc3dvcmQ6"',
+            "EAUTH",
+            str,
+            "AUTH LOGIN",
+          ),
+        );
       }
       this._responseActions.push((str2) => {
         this._actionAUTHComplete(str2, callback);
@@ -8613,7 +9218,7 @@ function requireSmtpConnection() {
       this._sendCommand(
         Buffer.from((this._auth.credentials.pass || "").toString(), "utf-8").toString("base64"),
         // Hidden pass for logs
-        Buffer.from("/* secret */", "utf-8").toString("base64")
+        Buffer.from("/* secret */", "utf-8").toString("base64"),
       );
     }
     /**
@@ -8644,22 +9249,24 @@ function requireSmtpConnection() {
             tnx: "smtp",
             username: this._auth.user,
             action: "authfail",
-            method: this._authMethod
+            method: this._authMethod,
           },
           "User %s failed to authenticate",
-          JSON.stringify(this._auth.user)
+          JSON.stringify(this._auth.user),
         );
-        return callback(this._formatError("Invalid login", "EAUTH", str, "AUTH " + this._authMethod));
+        return callback(
+          this._formatError("Invalid login", "EAUTH", str, "AUTH " + this._authMethod),
+        );
       }
       this.logger.info(
         {
           tnx: "smtp",
           username: this._auth.user,
           action: "authenticated",
-          method: this._authMethod
+          method: this._authMethod,
         },
         "User %s authenticated",
-        JSON.stringify(this._auth.user)
+        JSON.stringify(this._auth.user),
       );
       this.authenticated = true;
       callback(null, true);
@@ -8671,11 +9278,16 @@ function requireSmtpConnection() {
      */
     _actionMAIL(str, callback) {
       if (Number(str.charAt(0)) !== 2) {
-        const message = this._usingSmtpUtf8 && /^550 /.test(str) && /[\x80-\uFFFF]/.test(this._envelope.from) ? "Internationalized mailbox name not allowed" : "Mail command failed";
+        const message =
+          this._usingSmtpUtf8 && /^550 /.test(str) && /[\x80-\uFFFF]/.test(this._envelope.from)
+            ? "Internationalized mailbox name not allowed"
+            : "Mail command failed";
         return callback(this._formatError(message, "EENVELOPE", str, "MAIL FROM"));
       }
       if (!this._envelope.rcptQueue.length) {
-        return callback(this._formatError("Can't send mail - no recipients defined", "EENVELOPE", false, "API"));
+        return callback(
+          this._formatError("Can't send mail - no recipients defined", "EENVELOPE", false, "API"),
+        );
       }
       this._recipientQueue = [];
       const usePipelining = this._supportedExtensions.includes("PIPELINING");
@@ -8697,7 +9309,10 @@ function requireSmtpConnection() {
       let err;
       const curRecipient = this._recipientQueue.shift();
       if (Number(str.charAt(0)) !== 2) {
-        const message = this._usingSmtpUtf8 && /^553 /.test(str) && /[\x80-\uFFFF]/.test(curRecipient) ? "Internationalized mailbox name not allowed" : "Recipient command failed";
+        const message =
+          this._usingSmtpUtf8 && /^553 /.test(str) && /[\x80-\uFFFF]/.test(curRecipient)
+            ? "Internationalized mailbox name not allowed"
+            : "Recipient command failed";
         this._envelope.rejected.push(curRecipient);
         err = this._formatError(message, "EENVELOPE", str, "RCPT TO");
         err.recipient = curRecipient;
@@ -8712,7 +9327,12 @@ function requireSmtpConnection() {
           });
           this._sendCommand("DATA");
         } else {
-          err = this._formatError("Can't send mail - all recipients were rejected", "EENVELOPE", str, "RCPT TO");
+          err = this._formatError(
+            "Can't send mail - all recipients were rejected",
+            "EENVELOPE",
+            str,
+            "RCPT TO",
+          );
           err.rejected = this._envelope.rejected;
           err.rejectedErrors = this._envelope.rejectedErrors;
           return callback(err);
@@ -8737,7 +9357,7 @@ function requireSmtpConnection() {
       }
       const response = {
         accepted: this._envelope.accepted,
-        rejected: this._envelope.rejected
+        rejected: this._envelope.rejected,
       };
       if (this._ehloLines && this._ehloLines.length) {
         response.ehlo = this._ehloLines;
@@ -8771,7 +9391,12 @@ function requireSmtpConnection() {
     _actionLMTPStream(recipient, final, str, callback) {
       let err;
       if (Number(str.charAt(0)) !== 2) {
-        err = this._formatError("Message failed for recipient " + recipient, "EMESSAGE", str, "DATA");
+        err = this._formatError(
+          "Message failed for recipient " + recipient,
+          "EMESSAGE",
+          str,
+          "DATA",
+        );
         err.recipient = recipient;
         this._envelope.rejected.push(recipient);
         this._envelope.rejectedErrors.push(err);
@@ -8793,10 +9418,10 @@ function requireSmtpConnection() {
               tnx: "smtp",
               username: this._auth.user,
               action: "authfail",
-              method: this._authMethod
+              method: this._authMethod,
             },
             "User %s failed to authenticate",
-            JSON.stringify(this._auth.user)
+            JSON.stringify(this._auth.user),
           );
           return callback(this._formatError(err, "EAUTH", false, "AUTH XOAUTH2"));
         }
@@ -8806,7 +9431,7 @@ function requireSmtpConnection() {
         this._sendCommand(
           "AUTH XOAUTH2 " + this._auth.oauth2.buildXOAuth2Token(accessToken),
           //  Hidden for logs
-          "AUTH XOAUTH2 " + this._auth.oauth2.buildXOAuth2Token("/* secret */")
+          "AUTH XOAUTH2 " + this._auth.oauth2.buildXOAuth2Token("/* secret */"),
         );
       });
     }
@@ -8863,24 +9488,33 @@ function requireXoauth2() {
       this.options = options || {};
       if (options && options.serviceClient) {
         if (!options.privateKey || !options.user) {
-          const err = new Error('Options "privateKey" and "user" are required for service account!');
+          const err = new Error(
+            'Options "privateKey" and "user" are required for service account!',
+          );
           err.code = errors2.EOAUTH2;
           setImmediate(() => this.emit("error", err));
           return;
         }
-        const serviceRequestTimeout = Math.min(Math.max(Number(this.options.serviceRequestTimeout) || 0, 0), 3600);
+        const serviceRequestTimeout = Math.min(
+          Math.max(Number(this.options.serviceRequestTimeout) || 0, 0),
+          3600,
+        );
         this.options.serviceRequestTimeout = serviceRequestTimeout || 5 * 60;
       }
       this.logger = shared2.getLogger(
         {
-          logger
+          logger,
         },
         {
-          component: this.options.component || "OAuth2"
-        }
+          component: this.options.component || "OAuth2",
+        },
       );
-      this.provisionCallback = typeof this.options.provisionCallback === "function" ? this.options.provisionCallback : false;
-      this.options.accessUrl = this.options.accessUrl || "https://accounts.google.com/o/oauth2/token";
+      this.provisionCallback =
+        typeof this.options.provisionCallback === "function"
+          ? this.options.provisionCallback
+          : false;
+      this.options.accessUrl =
+        this.options.accessUrl || "https://accounts.google.com/o/oauth2/token";
       this.options.customHeaders = this.options.customHeaders || {};
       this.options.customParams = this.options.customParams || {};
       this.accessToken = this.options.accessToken || false;
@@ -8888,7 +9522,7 @@ function requireXoauth2() {
         this.expires = this.options.expires;
       } else {
         const timeout = Math.max(Number(this.options.timeout) || 0, 0);
-        this.expires = timeout && Date.now() + timeout * 1e3 || 0;
+        this.expires = (timeout && Date.now() + timeout * 1e3) || 0;
       }
       this.renewing = false;
       this.renewalQueue = [];
@@ -8905,10 +9539,10 @@ function requireXoauth2() {
           {
             tnx: "OAUTH2",
             user: this.options.user,
-            action: "reuse"
+            action: "reuse",
           },
           "Reusing existing access token for %s",
-          this.options.user
+          this.options.user,
         );
         return callback(null, this.accessToken);
       }
@@ -8918,10 +9552,10 @@ function requireXoauth2() {
             {
               tnx: "OAUTH2",
               user: this.options.user,
-              action: "reuse"
+              action: "reuse",
             },
             "Reusing existing access token (no refresh capability) for %s",
-            this.options.user
+            this.options.user,
           );
           return callback(null, this.accessToken);
         }
@@ -8929,10 +9563,10 @@ function requireXoauth2() {
           {
             tnx: "OAUTH2",
             user: this.options.user,
-            action: "renew"
+            action: "renew",
           },
           "Cannot renew access token for %s: No refresh mechanism available",
-          this.options.user
+          this.options.user,
         );
         const err = new Error("Can't create new access token for user");
         err.code = errors2.EOAUTH2;
@@ -8952,20 +9586,20 @@ function requireXoauth2() {
               err,
               tnx: "OAUTH2",
               user: this.options.user,
-              action: "renew"
+              action: "renew",
             },
             "Failed generating new Access Token for %s",
-            this.options.user
+            this.options.user,
           );
         } else {
           this.logger.info(
             {
               tnx: "OAUTH2",
               user: this.options.user,
-              action: "renew"
+              action: "renew",
             },
             "Generated new Access Token for %s",
-            this.options.user
+            this.options.user,
           );
         }
         callback(err, accessToken);
@@ -8993,11 +9627,11 @@ function requireXoauth2() {
     updateToken(accessToken, timeout) {
       this.accessToken = accessToken;
       timeout = Math.max(Number(timeout) || 0, 0);
-      this.expires = timeout && Date.now() + timeout * 1e3 || 0;
+      this.expires = (timeout && Date.now() + timeout * 1e3) || 0;
       this.emit("token", {
         user: this.options.user,
         accessToken: accessToken || "",
-        expires: this.expires
+        expires: this.expires,
       });
     }
     /**
@@ -9016,7 +9650,7 @@ function requireXoauth2() {
           sub: this.options.user,
           aud: this.options.accessUrl,
           iat,
-          exp: iat + this.options.serviceRequestTimeout
+          exp: iat + this.options.serviceRequestTimeout,
         };
         let token;
         try {
@@ -9028,11 +9662,11 @@ function requireXoauth2() {
         }
         urlOptions = {
           grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-          assertion: token
+          assertion: token,
         };
         loggedUrlOptions = {
           grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-          assertion: tokenData
+          assertion: tokenData,
         };
       } else {
         if (!this.options.refreshToken) {
@@ -9044,13 +9678,13 @@ function requireXoauth2() {
           client_id: this.options.clientId || "",
           client_secret: this.options.clientSecret || "",
           refresh_token: this.options.refreshToken,
-          grant_type: "refresh_token"
+          grant_type: "refresh_token",
         };
         loggedUrlOptions = {
           client_id: this.options.clientId || "",
           client_secret: (this.options.clientSecret || "").substr(0, 6) + "...",
           refresh_token: (this.options.refreshToken || "").substr(0, 6) + "...",
-          grant_type: "refresh_token"
+          grant_type: "refresh_token",
         };
       }
       Object.assign(urlOptions, this.options.customParams);
@@ -9059,10 +9693,10 @@ function requireXoauth2() {
         {
           tnx: "OAUTH2",
           user: this.options.user,
-          action: "generate"
+          action: "generate",
         },
         "Requesting token using: %s",
-        JSON.stringify(loggedUrlOptions)
+        JSON.stringify(loggedUrlOptions),
       );
       this.postRequest(this.options.accessUrl, urlOptions, this.options, (error, body) => {
         let data;
@@ -9079,10 +9713,10 @@ function requireXoauth2() {
             {
               tnx: "OAUTH2",
               user: this.options.user,
-              action: "post"
+              action: "post",
             },
             "Response: %s",
-            (body || "").toString()
+            (body || "").toString(),
           );
           const err2 = new Error("Invalid authentication response");
           err2.code = errors2.EOAUTH2;
@@ -9096,10 +9730,10 @@ function requireXoauth2() {
           {
             tnx: "OAUTH2",
             user: this.options.user,
-            action: "post"
+            action: "post",
           },
           "Response: %s",
-          JSON.stringify(logData)
+          JSON.stringify(logData),
         );
         if (data.error) {
           let errorMessage = data.error;
@@ -9129,7 +9763,12 @@ function requireXoauth2() {
      * @return {String} Base64 encoded token for IMAP or SMTP login
      */
     buildXOAuth2Token(accessToken) {
-      const authData = ["user=" + (this.options.user || ""), "auth=Bearer " + (accessToken || this.accessToken), "", ""];
+      const authData = [
+        "user=" + (this.options.user || ""),
+        "auth=Bearer " + (accessToken || this.accessToken),
+        "",
+        "",
+      ];
       return Buffer.from(authData.join(""), "utf-8").toString("base64");
     }
     /**
@@ -9152,7 +9791,7 @@ function requireXoauth2() {
         method: "post",
         headers: params.customHeaders,
         body: payload,
-        allowErrorResponse: true
+        allowErrorResponse: true,
       };
       if (/^https:/i.test(url)) {
         fetchOptions.tls = Object.assign({ rejectUnauthorized: true }, params.tls || {});
@@ -9199,8 +9838,13 @@ function requireXoauth2() {
      * @return {String} The generated and signed token
      */
     jwtSignRS256(payload) {
-      payload = ['{"alg":"RS256","typ":"JWT"}', JSON.stringify(payload)].map((val) => this.toBase64URL(val)).join(".");
-      const signature = crypto.createSign("RSA-SHA256").update(payload).sign(this.options.privateKey);
+      payload = ['{"alg":"RS256","typ":"JWT"}', JSON.stringify(payload)]
+        .map((val) => this.toBase64URL(val))
+        .join(".");
+      const signature = crypto
+        .createSign("RSA-SHA256")
+        .update(payload)
+        .sign(this.options.privateKey);
       return payload + "." + this.toBase64URL(signature);
     }
   }
@@ -9227,12 +9871,14 @@ function requirePoolResource() {
         switch ((this.options.auth.type || "").toString().toUpperCase()) {
           case "OAUTH2": {
             const oauth2 = new XOAuth2(this.options.auth, this.logger);
-            oauth2.provisionCallback = this.pool.mailer && this.pool.mailer.get("oauth2_provision_cb") || oauth2.provisionCallback;
+            oauth2.provisionCallback =
+              (this.pool.mailer && this.pool.mailer.get("oauth2_provision_cb")) ||
+              oauth2.provisionCallback;
             this.auth = {
               type: "OAUTH2",
               user: this.options.auth.user,
               oauth2,
-              method: "XOAUTH2"
+              method: "XOAUTH2",
             };
             oauth2.on("token", (token) => this.pool.mailer.emit("token", token));
             oauth2.on("error", (err) => this.emit("error", err));
@@ -9248,9 +9894,12 @@ function requirePoolResource() {
               credentials: {
                 user: this.options.auth.user || "",
                 pass: this.options.auth.pass,
-                options: this.options.auth.options
+                options: this.options.auth.options,
               },
-              method: (this.options.auth.method || "").trim().toUpperCase() || this.options.authMethod || false
+              method:
+                (this.options.auth.method || "").trim().toUpperCase() ||
+                this.options.authMethod ||
+                false,
             };
         }
       }
@@ -9279,13 +9928,13 @@ function requirePoolResource() {
               remotePort: socketOptions.connection.remotePort,
               destHost: options.host || "",
               destPort: options.port || "",
-              action: "connected"
+              action: "connected",
             },
             "Using proxied socket from %s:%s to %s:%s",
             socketOptions.connection.remoteAddress,
             socketOptions.connection.remotePort,
             options.host || "",
-            options.port || ""
+            options.port || "",
           );
           options = Object.assign(assign(false, options), socketOptions);
         }
@@ -9316,8 +9965,7 @@ function requirePoolResource() {
           }, 1e3);
           try {
             timer.unref();
-          } catch (_E) {
-          }
+          } catch (_E) {}
         });
         this.connection.connect(() => {
           if (returned) {
@@ -9370,12 +10018,12 @@ function requirePoolResource() {
         {
           tnx: "send",
           messageId,
-          cid: this.id
+          cid: this.id,
         },
         "Sending message %s using #%s to <%s>",
         messageId,
         this.id,
-        recipients.join(", ")
+        recipients.join(", "),
       );
       if (mail.data.dsn) {
         envelope.dsn = mail.data.dsn;
@@ -9392,7 +10040,7 @@ function requirePoolResource() {
         }
         info.envelope = {
           from: envelope.from,
-          to: envelope.to
+          to: envelope.to,
         };
         info.messageId = messageId;
         setImmediate(() => {
@@ -9428,67 +10076,317 @@ function requirePoolResource() {
   poolResource = PoolResource;
   return poolResource;
 }
-const Aliyun = { "description": "Alibaba Cloud Mail", "domains": ["aliyun.com"], "host": "smtp.aliyun.com", "port": 465, "secure": true };
-const AliyunQiye = { "description": "Alibaba Cloud Enterprise Mail", "host": "smtp.qiye.aliyun.com", "port": 465, "secure": true };
-const AOL = { "description": "AOL Mail", "domains": ["aol.com"], "host": "smtp.aol.com", "port": 587 };
-const Aruba = { "description": "Aruba PEC (Italian email provider)", "domains": ["aruba.it", "pec.aruba.it"], "aliases": ["Aruba PEC"], "host": "smtps.aruba.it", "port": 465, "secure": true, "authMethod": "LOGIN" };
-const Bluewin = { "description": "Bluewin (Swiss email provider)", "host": "smtpauths.bluewin.ch", "domains": ["bluewin.ch"], "port": 465 };
-const BOL = { "description": "BOL Mail (Brazilian provider)", "domains": ["bol.com.br"], "host": "smtp.bol.com.br", "port": 587, "requireTLS": true };
-const DebugMail = { "description": "DebugMail (email testing service)", "host": "debugmail.io", "port": 25 };
-const Disroot = { "description": "Disroot (privacy-focused provider)", "domains": ["disroot.org"], "host": "disroot.org", "port": 587, "secure": false, "authMethod": "LOGIN" };
-const DynectEmail = { "description": "Dyn Email Delivery", "aliases": ["Dynect"], "host": "smtp.dynect.net", "port": 25 };
-const ElasticEmail = { "description": "Elastic Email", "aliases": ["Elastic Email"], "host": "smtp.elasticemail.com", "port": 465, "secure": true };
-const Ethereal = { "description": "Ethereal Email (email testing service)", "aliases": ["ethereal.email"], "host": "smtp.ethereal.email", "port": 587 };
-const FastMail = { "description": "FastMail", "domains": ["fastmail.fm"], "host": "smtp.fastmail.com", "port": 465, "secure": true };
-const GandiMail = { "description": "Gandi Mail", "aliases": ["Gandi", "Gandi Mail"], "host": "mail.gandi.net", "port": 587 };
-const Gmail = { "description": "Gmail", "aliases": ["Google Mail"], "domains": ["gmail.com", "googlemail.com"], "host": "smtp.gmail.com", "port": 465, "secure": true };
-const GmailWorkspace = { "description": "Gmail Workspace", "aliases": ["Google Workspace Mail"], "host": "smtp-relay.gmail.com", "port": 465, "secure": true };
-const GMX = { "description": "GMX Mail", "domains": ["gmx.com", "gmx.net", "gmx.de"], "host": "mail.gmx.com", "port": 587 };
-const Godaddy = { "description": "GoDaddy Email (US)", "host": "smtpout.secureserver.net", "port": 25 };
-const GodaddyAsia = { "description": "GoDaddy Email (Asia)", "host": "smtp.asia.secureserver.net", "port": 25 };
-const GodaddyEurope = { "description": "GoDaddy Email (Europe)", "host": "smtp.europe.secureserver.net", "port": 25 };
-const Hotmail = { "description": "Outlook.com / Hotmail", "aliases": ["Outlook", "Outlook.com", "Hotmail.com"], "domains": ["hotmail.com", "outlook.com"], "host": "smtp-mail.outlook.com", "port": 587 };
-const iCloud = { "description": "iCloud Mail", "aliases": ["Me", "Mac"], "domains": ["me.com", "mac.com"], "host": "smtp.mail.me.com", "port": 587 };
-const Infomaniak = { "description": "Infomaniak Mail (Swiss hosting provider)", "host": "mail.infomaniak.com", "domains": ["ik.me", "ikmail.com", "etik.com"], "port": 587 };
-const KolabNow = { "description": "KolabNow (secure email service)", "domains": ["kolabnow.com"], "aliases": ["Kolab"], "host": "smtp.kolabnow.com", "port": 465, "secure": true, "authMethod": "LOGIN" };
-const Loopia = { "description": "Loopia (Swedish hosting provider)", "host": "mailcluster.loopia.se", "port": 465 };
-const Loops = { "description": "Loops", "host": "smtp.loops.so", "port": 587 };
-const Maildev = { "description": "MailDev (local email testing)", "port": 1025, "ignoreTLS": true };
-const MailerSend = { "description": "MailerSend", "host": "smtp.mailersend.net", "port": 587 };
-const Mailgun = { "description": "Mailgun", "host": "smtp.mailgun.org", "port": 465, "secure": true };
-const Mailjet = { "description": "Mailjet", "host": "in.mailjet.com", "port": 587 };
-const Mailosaur = { "description": "Mailosaur (email testing service)", "host": "mailosaur.io", "port": 25 };
-const Mailtrap = { "description": "Mailtrap", "host": "live.smtp.mailtrap.io", "port": 587 };
-const Mandrill = { "description": "Mandrill (by Mailchimp)", "host": "smtp.mandrillapp.com", "port": 587 };
-const Naver = { "description": "Naver Mail (Korean email provider)", "host": "smtp.naver.com", "port": 587 };
-const OhMySMTP = { "description": "OhMySMTP (email delivery service)", "host": "smtp.ohmysmtp.com", "port": 587, "secure": false };
-const One = { "description": "One.com Email", "host": "send.one.com", "port": 465, "secure": true };
-const OpenMailBox = { "description": "OpenMailBox", "aliases": ["OMB", "openmailbox.org"], "host": "smtp.openmailbox.org", "port": 465, "secure": true };
-const Outlook365 = { "description": "Microsoft 365 / Office 365", "host": "smtp.office365.com", "port": 587, "secure": false };
-const Postmark = { "description": "Postmark", "aliases": ["PostmarkApp"], "host": "smtp.postmarkapp.com", "port": 2525 };
-const Proton = { "description": "Proton Mail", "aliases": ["ProtonMail", "Proton.me", "Protonmail.com", "Protonmail.ch"], "domains": ["proton.me", "protonmail.com", "pm.me", "protonmail.ch"], "host": "smtp.protonmail.ch", "port": 587, "requireTLS": true };
-const QQ = { "description": "QQ Mail", "domains": ["qq.com"], "host": "smtp.qq.com", "port": 465, "secure": true };
-const QQex = { "description": "QQ Enterprise Mail", "aliases": ["QQ Enterprise"], "domains": ["exmail.qq.com"], "host": "smtp.exmail.qq.com", "port": 465, "secure": true };
-const Resend = { "description": "Resend", "host": "smtp.resend.com", "port": 465, "secure": true };
-const Runbox = { "description": "Runbox (Norwegian email provider)", "domains": ["runbox.com"], "host": "smtp.runbox.com", "port": 465, "secure": true };
-const SendCloud = { "description": "SendCloud (Chinese email delivery)", "host": "smtp.sendcloud.net", "port": 2525 };
-const SendGrid = { "description": "SendGrid", "host": "smtp.sendgrid.net", "port": 587 };
-const SendinBlue = { "description": "Brevo (formerly Sendinblue)", "aliases": ["Brevo"], "host": "smtp-relay.brevo.com", "port": 587 };
-const SendPulse = { "description": "SendPulse", "host": "smtp-pulse.com", "port": 465, "secure": true };
-const SES = { "description": "AWS SES US East (N. Virginia)", "host": "email-smtp.us-east-1.amazonaws.com", "port": 465, "secure": true };
-const Seznam = { "description": "Seznam Email (Czech email provider)", "aliases": ["Seznam Email"], "domains": ["seznam.cz", "email.cz", "post.cz", "spoluzaci.cz"], "host": "smtp.seznam.cz", "port": 465, "secure": true };
-const SMTP2GO = { "description": "SMTP2GO", "host": "mail.smtp2go.com", "port": 2525 };
-const Sparkpost = { "description": "SparkPost", "aliases": ["SparkPost", "SparkPost Mail"], "domains": ["sparkpost.com"], "host": "smtp.sparkpostmail.com", "port": 587, "secure": false };
-const Tipimail = { "description": "Tipimail (email delivery service)", "host": "smtp.tipimail.com", "port": 587 };
-const Tutanota = { "description": "Tutanota (Tuta Mail)", "domains": ["tutanota.com", "tuta.com", "tutanota.de", "tuta.io"], "host": "smtp.tutanota.com", "port": 465, "secure": true };
-const Yahoo = { "description": "Yahoo Mail", "domains": ["yahoo.com"], "host": "smtp.mail.yahoo.com", "port": 465, "secure": true };
-const Yandex = { "description": "Yandex Mail", "domains": ["yandex.ru"], "host": "smtp.yandex.ru", "port": 465, "secure": true };
-const Zimbra = { "description": "Zimbra Mail Server", "aliases": ["Zimbra Collaboration"], "host": "smtp.zimbra.com", "port": 587, "requireTLS": true };
-const Zoho = { "description": "Zoho Mail", "host": "smtp.zoho.com", "port": 465, "secure": true, "authMethod": "LOGIN" };
+const Aliyun = {
+  description: "Alibaba Cloud Mail",
+  domains: ["aliyun.com"],
+  host: "smtp.aliyun.com",
+  port: 465,
+  secure: true,
+};
+const AliyunQiye = {
+  description: "Alibaba Cloud Enterprise Mail",
+  host: "smtp.qiye.aliyun.com",
+  port: 465,
+  secure: true,
+};
+const AOL = { description: "AOL Mail", domains: ["aol.com"], host: "smtp.aol.com", port: 587 };
+const Aruba = {
+  description: "Aruba PEC (Italian email provider)",
+  domains: ["aruba.it", "pec.aruba.it"],
+  aliases: ["Aruba PEC"],
+  host: "smtps.aruba.it",
+  port: 465,
+  secure: true,
+  authMethod: "LOGIN",
+};
+const Bluewin = {
+  description: "Bluewin (Swiss email provider)",
+  host: "smtpauths.bluewin.ch",
+  domains: ["bluewin.ch"],
+  port: 465,
+};
+const BOL = {
+  description: "BOL Mail (Brazilian provider)",
+  domains: ["bol.com.br"],
+  host: "smtp.bol.com.br",
+  port: 587,
+  requireTLS: true,
+};
+const DebugMail = {
+  description: "DebugMail (email testing service)",
+  host: "debugmail.io",
+  port: 25,
+};
+const Disroot = {
+  description: "Disroot (privacy-focused provider)",
+  domains: ["disroot.org"],
+  host: "disroot.org",
+  port: 587,
+  secure: false,
+  authMethod: "LOGIN",
+};
+const DynectEmail = {
+  description: "Dyn Email Delivery",
+  aliases: ["Dynect"],
+  host: "smtp.dynect.net",
+  port: 25,
+};
+const ElasticEmail = {
+  description: "Elastic Email",
+  aliases: ["Elastic Email"],
+  host: "smtp.elasticemail.com",
+  port: 465,
+  secure: true,
+};
+const Ethereal = {
+  description: "Ethereal Email (email testing service)",
+  aliases: ["ethereal.email"],
+  host: "smtp.ethereal.email",
+  port: 587,
+};
+const FastMail = {
+  description: "FastMail",
+  domains: ["fastmail.fm"],
+  host: "smtp.fastmail.com",
+  port: 465,
+  secure: true,
+};
+const GandiMail = {
+  description: "Gandi Mail",
+  aliases: ["Gandi", "Gandi Mail"],
+  host: "mail.gandi.net",
+  port: 587,
+};
+const Gmail = {
+  description: "Gmail",
+  aliases: ["Google Mail"],
+  domains: ["gmail.com", "googlemail.com"],
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+};
+const GmailWorkspace = {
+  description: "Gmail Workspace",
+  aliases: ["Google Workspace Mail"],
+  host: "smtp-relay.gmail.com",
+  port: 465,
+  secure: true,
+};
+const GMX = {
+  description: "GMX Mail",
+  domains: ["gmx.com", "gmx.net", "gmx.de"],
+  host: "mail.gmx.com",
+  port: 587,
+};
+const Godaddy = { description: "GoDaddy Email (US)", host: "smtpout.secureserver.net", port: 25 };
+const GodaddyAsia = {
+  description: "GoDaddy Email (Asia)",
+  host: "smtp.asia.secureserver.net",
+  port: 25,
+};
+const GodaddyEurope = {
+  description: "GoDaddy Email (Europe)",
+  host: "smtp.europe.secureserver.net",
+  port: 25,
+};
+const Hotmail = {
+  description: "Outlook.com / Hotmail",
+  aliases: ["Outlook", "Outlook.com", "Hotmail.com"],
+  domains: ["hotmail.com", "outlook.com"],
+  host: "smtp-mail.outlook.com",
+  port: 587,
+};
+const iCloud = {
+  description: "iCloud Mail",
+  aliases: ["Me", "Mac"],
+  domains: ["me.com", "mac.com"],
+  host: "smtp.mail.me.com",
+  port: 587,
+};
+const Infomaniak = {
+  description: "Infomaniak Mail (Swiss hosting provider)",
+  host: "mail.infomaniak.com",
+  domains: ["ik.me", "ikmail.com", "etik.com"],
+  port: 587,
+};
+const KolabNow = {
+  description: "KolabNow (secure email service)",
+  domains: ["kolabnow.com"],
+  aliases: ["Kolab"],
+  host: "smtp.kolabnow.com",
+  port: 465,
+  secure: true,
+  authMethod: "LOGIN",
+};
+const Loopia = {
+  description: "Loopia (Swedish hosting provider)",
+  host: "mailcluster.loopia.se",
+  port: 465,
+};
+const Loops = { description: "Loops", host: "smtp.loops.so", port: 587 };
+const Maildev = { description: "MailDev (local email testing)", port: 1025, ignoreTLS: true };
+const MailerSend = { description: "MailerSend", host: "smtp.mailersend.net", port: 587 };
+const Mailgun = { description: "Mailgun", host: "smtp.mailgun.org", port: 465, secure: true };
+const Mailjet = { description: "Mailjet", host: "in.mailjet.com", port: 587 };
+const Mailosaur = {
+  description: "Mailosaur (email testing service)",
+  host: "mailosaur.io",
+  port: 25,
+};
+const Mailtrap = { description: "Mailtrap", host: "live.smtp.mailtrap.io", port: 587 };
+const Mandrill = {
+  description: "Mandrill (by Mailchimp)",
+  host: "smtp.mandrillapp.com",
+  port: 587,
+};
+const Naver = {
+  description: "Naver Mail (Korean email provider)",
+  host: "smtp.naver.com",
+  port: 587,
+};
+const OhMySMTP = {
+  description: "OhMySMTP (email delivery service)",
+  host: "smtp.ohmysmtp.com",
+  port: 587,
+  secure: false,
+};
+const One = { description: "One.com Email", host: "send.one.com", port: 465, secure: true };
+const OpenMailBox = {
+  description: "OpenMailBox",
+  aliases: ["OMB", "openmailbox.org"],
+  host: "smtp.openmailbox.org",
+  port: 465,
+  secure: true,
+};
+const Outlook365 = {
+  description: "Microsoft 365 / Office 365",
+  host: "smtp.office365.com",
+  port: 587,
+  secure: false,
+};
+const Postmark = {
+  description: "Postmark",
+  aliases: ["PostmarkApp"],
+  host: "smtp.postmarkapp.com",
+  port: 2525,
+};
+const Proton = {
+  description: "Proton Mail",
+  aliases: ["ProtonMail", "Proton.me", "Protonmail.com", "Protonmail.ch"],
+  domains: ["proton.me", "protonmail.com", "pm.me", "protonmail.ch"],
+  host: "smtp.protonmail.ch",
+  port: 587,
+  requireTLS: true,
+};
+const QQ = {
+  description: "QQ Mail",
+  domains: ["qq.com"],
+  host: "smtp.qq.com",
+  port: 465,
+  secure: true,
+};
+const QQex = {
+  description: "QQ Enterprise Mail",
+  aliases: ["QQ Enterprise"],
+  domains: ["exmail.qq.com"],
+  host: "smtp.exmail.qq.com",
+  port: 465,
+  secure: true,
+};
+const Resend = { description: "Resend", host: "smtp.resend.com", port: 465, secure: true };
+const Runbox = {
+  description: "Runbox (Norwegian email provider)",
+  domains: ["runbox.com"],
+  host: "smtp.runbox.com",
+  port: 465,
+  secure: true,
+};
+const SendCloud = {
+  description: "SendCloud (Chinese email delivery)",
+  host: "smtp.sendcloud.net",
+  port: 2525,
+};
+const SendGrid = { description: "SendGrid", host: "smtp.sendgrid.net", port: 587 };
+const SendinBlue = {
+  description: "Brevo (formerly Sendinblue)",
+  aliases: ["Brevo"],
+  host: "smtp-relay.brevo.com",
+  port: 587,
+};
+const SendPulse = { description: "SendPulse", host: "smtp-pulse.com", port: 465, secure: true };
+const SES = {
+  description: "AWS SES US East (N. Virginia)",
+  host: "email-smtp.us-east-1.amazonaws.com",
+  port: 465,
+  secure: true,
+};
+const Seznam = {
+  description: "Seznam Email (Czech email provider)",
+  aliases: ["Seznam Email"],
+  domains: ["seznam.cz", "email.cz", "post.cz", "spoluzaci.cz"],
+  host: "smtp.seznam.cz",
+  port: 465,
+  secure: true,
+};
+const SMTP2GO = { description: "SMTP2GO", host: "mail.smtp2go.com", port: 2525 };
+const Sparkpost = {
+  description: "SparkPost",
+  aliases: ["SparkPost", "SparkPost Mail"],
+  domains: ["sparkpost.com"],
+  host: "smtp.sparkpostmail.com",
+  port: 587,
+  secure: false,
+};
+const Tipimail = {
+  description: "Tipimail (email delivery service)",
+  host: "smtp.tipimail.com",
+  port: 587,
+};
+const Tutanota = {
+  description: "Tutanota (Tuta Mail)",
+  domains: ["tutanota.com", "tuta.com", "tutanota.de", "tuta.io"],
+  host: "smtp.tutanota.com",
+  port: 465,
+  secure: true,
+};
+const Yahoo = {
+  description: "Yahoo Mail",
+  domains: ["yahoo.com"],
+  host: "smtp.mail.yahoo.com",
+  port: 465,
+  secure: true,
+};
+const Yandex = {
+  description: "Yandex Mail",
+  domains: ["yandex.ru"],
+  host: "smtp.yandex.ru",
+  port: 465,
+  secure: true,
+};
+const Zimbra = {
+  description: "Zimbra Mail Server",
+  aliases: ["Zimbra Collaboration"],
+  host: "smtp.zimbra.com",
+  port: 587,
+  requireTLS: true,
+};
+const Zoho = {
+  description: "Zoho Mail",
+  host: "smtp.zoho.com",
+  port: 465,
+  secure: true,
+  authMethod: "LOGIN",
+};
 const require$$0 = {
-  "126": { "description": "126 Mail (NetEase)", "host": "smtp.126.com", "port": 465, "secure": true },
-  "163": { "description": "163 Mail (NetEase)", "host": "smtp.163.com", "port": 465, "secure": true },
-  "1und1": { "description": "1&1 Mail (German hosting provider)", "host": "smtp.1und1.de", "port": 465, "secure": true, "authMethod": "LOGIN" },
+  126: { description: "126 Mail (NetEase)", host: "smtp.126.com", port: 465, secure: true },
+  163: { description: "163 Mail (NetEase)", host: "smtp.163.com", port: 465, secure: true },
+  "1und1": {
+    description: "1&1 Mail (German hosting provider)",
+    host: "smtp.1und1.de",
+    port: 465,
+    secure: true,
+    authMethod: "LOGIN",
+  },
   Aliyun,
   AliyunQiye,
   AOL,
@@ -9501,8 +10399,22 @@ const require$$0 = {
   ElasticEmail,
   Ethereal,
   FastMail,
-  "Feishu Mail": { "description": "Feishu Mail (Lark)", "aliases": ["Feishu", "FeishuMail"], "domains": ["www.feishu.cn"], "host": "smtp.feishu.cn", "port": 465, "secure": true },
-  "Forward Email": { "description": "Forward Email (email forwarding service)", "aliases": ["FE", "ForwardEmail"], "domains": ["forwardemail.net"], "host": "smtp.forwardemail.net", "port": 465, "secure": true },
+  "Feishu Mail": {
+    description: "Feishu Mail (Lark)",
+    aliases: ["Feishu", "FeishuMail"],
+    domains: ["www.feishu.cn"],
+    host: "smtp.feishu.cn",
+    port: 465,
+    secure: true,
+  },
+  "Forward Email": {
+    description: "Forward Email (email forwarding service)",
+    aliases: ["FE", "ForwardEmail"],
+    domains: ["forwardemail.net"],
+    host: "smtp.forwardemail.net",
+    port: 465,
+    secure: true,
+  },
   GandiMail,
   Gmail,
   GmailWorkspace,
@@ -9510,16 +10422,20 @@ const require$$0 = {
   Godaddy,
   GodaddyAsia,
   GodaddyEurope,
-  "hot.ee": { "description": "Hot.ee (Estonian email provider)", "host": "mail.hot.ee" },
+  "hot.ee": { description: "Hot.ee (Estonian email provider)", host: "mail.hot.ee" },
   Hotmail,
   iCloud,
   Infomaniak,
   KolabNow,
   Loopia,
   Loops,
-  "mail.ee": { "description": "Mail.ee (Estonian email provider)", "host": "smtp.mail.ee" },
-  "Mail.ru": { "description": "Mail.ru", "host": "smtp.mail.ru", "port": 465, "secure": true },
-  "Mailcatch.app": { "description": "Mailcatch (email testing service)", "host": "sandbox-smtp.mailcatch.app", "port": 2525 },
+  "mail.ee": { description: "Mail.ee (Estonian email provider)", host: "smtp.mail.ee" },
+  "Mail.ru": { description: "Mail.ru", host: "smtp.mail.ru", port: 465, secure: true },
+  "Mailcatch.app": {
+    description: "Mailcatch (email testing service)",
+    host: "sandbox-smtp.mailcatch.app",
+    port: 2525,
+  },
   Maildev,
   MailerSend,
   Mailgun,
@@ -9534,7 +10450,12 @@ const require$$0 = {
   Outlook365,
   Postmark,
   Proton,
-  "qiye.aliyun": { "description": "Alibaba Mail Enterprise Edition", "host": "smtp.mxhichina.com", "port": "465", "secure": true },
+  "qiye.aliyun": {
+    description: "Alibaba Mail Enterprise Edition",
+    host: "smtp.mxhichina.com",
+    port: "465",
+    secure: true,
+  },
   QQ,
   QQex,
   Resend,
@@ -9544,25 +10465,120 @@ const require$$0 = {
   SendinBlue,
   SendPulse,
   SES,
-  "SES-AP-NORTHEAST-1": { "description": "AWS SES Asia Pacific (Tokyo)", "host": "email-smtp.ap-northeast-1.amazonaws.com", "port": 465, "secure": true },
-  "SES-AP-NORTHEAST-2": { "description": "AWS SES Asia Pacific (Seoul)", "host": "email-smtp.ap-northeast-2.amazonaws.com", "port": 465, "secure": true },
-  "SES-AP-NORTHEAST-3": { "description": "AWS SES Asia Pacific (Osaka)", "host": "email-smtp.ap-northeast-3.amazonaws.com", "port": 465, "secure": true },
-  "SES-AP-SOUTH-1": { "description": "AWS SES Asia Pacific (Mumbai)", "host": "email-smtp.ap-south-1.amazonaws.com", "port": 465, "secure": true },
-  "SES-AP-SOUTHEAST-1": { "description": "AWS SES Asia Pacific (Singapore)", "host": "email-smtp.ap-southeast-1.amazonaws.com", "port": 465, "secure": true },
-  "SES-AP-SOUTHEAST-2": { "description": "AWS SES Asia Pacific (Sydney)", "host": "email-smtp.ap-southeast-2.amazonaws.com", "port": 465, "secure": true },
-  "SES-CA-CENTRAL-1": { "description": "AWS SES Canada (Central)", "host": "email-smtp.ca-central-1.amazonaws.com", "port": 465, "secure": true },
-  "SES-EU-CENTRAL-1": { "description": "AWS SES Europe (Frankfurt)", "host": "email-smtp.eu-central-1.amazonaws.com", "port": 465, "secure": true },
-  "SES-EU-NORTH-1": { "description": "AWS SES Europe (Stockholm)", "host": "email-smtp.eu-north-1.amazonaws.com", "port": 465, "secure": true },
-  "SES-EU-WEST-1": { "description": "AWS SES Europe (Ireland)", "host": "email-smtp.eu-west-1.amazonaws.com", "port": 465, "secure": true },
-  "SES-EU-WEST-2": { "description": "AWS SES Europe (London)", "host": "email-smtp.eu-west-2.amazonaws.com", "port": 465, "secure": true },
-  "SES-EU-WEST-3": { "description": "AWS SES Europe (Paris)", "host": "email-smtp.eu-west-3.amazonaws.com", "port": 465, "secure": true },
-  "SES-SA-EAST-1": { "description": "AWS SES South America (São Paulo)", "host": "email-smtp.sa-east-1.amazonaws.com", "port": 465, "secure": true },
-  "SES-US-EAST-1": { "description": "AWS SES US East (N. Virginia)", "host": "email-smtp.us-east-1.amazonaws.com", "port": 465, "secure": true },
-  "SES-US-EAST-2": { "description": "AWS SES US East (Ohio)", "host": "email-smtp.us-east-2.amazonaws.com", "port": 465, "secure": true },
-  "SES-US-GOV-EAST-1": { "description": "AWS SES GovCloud (US-East)", "host": "email-smtp.us-gov-east-1.amazonaws.com", "port": 465, "secure": true },
-  "SES-US-GOV-WEST-1": { "description": "AWS SES GovCloud (US-West)", "host": "email-smtp.us-gov-west-1.amazonaws.com", "port": 465, "secure": true },
-  "SES-US-WEST-1": { "description": "AWS SES US West (N. California)", "host": "email-smtp.us-west-1.amazonaws.com", "port": 465, "secure": true },
-  "SES-US-WEST-2": { "description": "AWS SES US West (Oregon)", "host": "email-smtp.us-west-2.amazonaws.com", "port": 465, "secure": true },
+  "SES-AP-NORTHEAST-1": {
+    description: "AWS SES Asia Pacific (Tokyo)",
+    host: "email-smtp.ap-northeast-1.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-AP-NORTHEAST-2": {
+    description: "AWS SES Asia Pacific (Seoul)",
+    host: "email-smtp.ap-northeast-2.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-AP-NORTHEAST-3": {
+    description: "AWS SES Asia Pacific (Osaka)",
+    host: "email-smtp.ap-northeast-3.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-AP-SOUTH-1": {
+    description: "AWS SES Asia Pacific (Mumbai)",
+    host: "email-smtp.ap-south-1.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-AP-SOUTHEAST-1": {
+    description: "AWS SES Asia Pacific (Singapore)",
+    host: "email-smtp.ap-southeast-1.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-AP-SOUTHEAST-2": {
+    description: "AWS SES Asia Pacific (Sydney)",
+    host: "email-smtp.ap-southeast-2.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-CA-CENTRAL-1": {
+    description: "AWS SES Canada (Central)",
+    host: "email-smtp.ca-central-1.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-EU-CENTRAL-1": {
+    description: "AWS SES Europe (Frankfurt)",
+    host: "email-smtp.eu-central-1.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-EU-NORTH-1": {
+    description: "AWS SES Europe (Stockholm)",
+    host: "email-smtp.eu-north-1.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-EU-WEST-1": {
+    description: "AWS SES Europe (Ireland)",
+    host: "email-smtp.eu-west-1.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-EU-WEST-2": {
+    description: "AWS SES Europe (London)",
+    host: "email-smtp.eu-west-2.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-EU-WEST-3": {
+    description: "AWS SES Europe (Paris)",
+    host: "email-smtp.eu-west-3.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-SA-EAST-1": {
+    description: "AWS SES South America (São Paulo)",
+    host: "email-smtp.sa-east-1.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-US-EAST-1": {
+    description: "AWS SES US East (N. Virginia)",
+    host: "email-smtp.us-east-1.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-US-EAST-2": {
+    description: "AWS SES US East (Ohio)",
+    host: "email-smtp.us-east-2.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-US-GOV-EAST-1": {
+    description: "AWS SES GovCloud (US-East)",
+    host: "email-smtp.us-gov-east-1.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-US-GOV-WEST-1": {
+    description: "AWS SES GovCloud (US-West)",
+    host: "email-smtp.us-gov-west-1.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-US-WEST-1": {
+    description: "AWS SES US West (N. California)",
+    host: "email-smtp.us-west-1.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
+  "SES-US-WEST-2": {
+    description: "AWS SES US West (Oregon)",
+    host: "email-smtp.us-west-2.amazonaws.com",
+    port: 465,
+    secure: true,
+  },
   Seznam,
   SMTP2GO,
   Sparkpost,
@@ -9571,7 +10587,7 @@ const require$$0 = {
   Yahoo,
   Yandex,
   Zimbra,
-  Zoho
+  Zoho,
 };
 var wellKnown;
 var hasRequiredWellKnown;
@@ -9603,7 +10619,7 @@ function requireWellKnown() {
     });
     return response;
   }
-  wellKnown = function(key) {
+  wellKnown = function (key) {
     key = normalizeKey(key.split("@").pop());
     return normalized[key] || false;
   };
@@ -9627,7 +10643,7 @@ function requireSmtpPool() {
       options = options || {};
       if (typeof options === "string") {
         options = {
-          url: options
+          url: options,
         };
       }
       let urlData;
@@ -9646,13 +10662,13 @@ function requireSmtpPool() {
         // regular options
         urlData,
         // url options
-        service && wellKnown2(service)
+        service && wellKnown2(service),
         // wellknown options
       );
       this.options.maxConnections = this.options.maxConnections || 5;
       this.options.maxMessages = this.options.maxMessages || 100;
       this.logger = shared2.getLogger(this.options, {
-        component: this.options.component || "smtp-pool"
+        component: this.options.component || "smtp-pool",
       });
       this.name = "SMTP (pool)";
       this.version = packageData.version + "[client:" + packageData.version + "]";
@@ -9662,7 +10678,7 @@ function requireSmtpPool() {
         waiting: [],
         checkpoint: false,
         delta: Number(this.options.rateDelta) || 1e3,
-        limit: Number(this.options.rateLimit) || 0
+        limit: Number(this.options.rateLimit) || 0,
       };
       this._closed = false;
       this._queue = [];
@@ -9698,7 +10714,7 @@ function requireSmtpPool() {
       this._queue.push({
         mail,
         requeueAttempts: 0,
-        callback
+        callback,
       });
       if (this.idling && this._queue.length >= this.options.maxConnections) {
         this.idling = false;
@@ -9726,19 +10742,19 @@ function requireSmtpPool() {
             {
               tnx: "connection",
               cid: connection.id,
-              action: "removed"
+              action: "removed",
             },
             "Connection #%s removed",
-            connection.id
+            connection.id,
           );
         }
       }
       if (len && !this._connections.length) {
         this.logger.debug(
           {
-            tnx: "connection"
+            tnx: "connection",
           },
-          "All connections removed"
+          "All connections removed",
         );
       }
       if (!this._queue.length) {
@@ -9748,9 +10764,9 @@ function requireSmtpPool() {
         if (!this._queue.length) {
           this.logger.debug(
             {
-              tnx: "connection"
+              tnx: "connection",
             },
-            "Pending queue entries cleared"
+            "Pending queue entries cleared",
           );
           return;
         }
@@ -9763,11 +10779,11 @@ function requireSmtpPool() {
               {
                 err: E,
                 tnx: "callback",
-                cid: connection.id
+                cid: connection.id,
               },
               "Callback error for #%s: %s",
               connection.id,
-              E.message
+              E.message,
             );
           }
         }
@@ -9802,20 +10818,23 @@ function requireSmtpPool() {
         this.idling = true;
         this.emit("idle");
       }
-      const entry = connection.queueEntry = this._queue.shift();
-      entry.messageId = (connection.queueEntry.mail.message.getHeader("message-id") || "").replace(/[<>\s]/g, "");
+      const entry = (connection.queueEntry = this._queue.shift());
+      entry.messageId = (connection.queueEntry.mail.message.getHeader("message-id") || "").replace(
+        /[<>\s]/g,
+        "",
+      );
       connection.available = false;
       this.logger.debug(
         {
           tnx: "pool",
           cid: connection.id,
           messageId: entry.messageId,
-          action: "assign"
+          action: "assign",
         },
         "Assigned message <%s> to #%s (%s)",
         entry.messageId,
         connection.id,
-        connection.messages + 1
+        connection.messages + 1,
       );
       if (this._rateLimit.limit) {
         this._rateLimit.counter++;
@@ -9832,11 +10851,11 @@ function requireSmtpPool() {
               {
                 err: E,
                 tnx: "callback",
-                cid: connection.id
+                cid: connection.id,
               },
               "Callback error for #%s: %s",
               connection.id,
-              E.message
+              E.message,
             );
           }
           connection.queueEntry = false;
@@ -9853,20 +10872,20 @@ function requireSmtpPool() {
         {
           tnx: "pool",
           cid: connection.id,
-          action: "conection"
+          action: "conection",
         },
         "Created new pool resource #%s",
-        connection.id
+        connection.id,
       );
       connection.on("available", () => {
         this.logger.debug(
           {
             tnx: "connection",
             cid: connection.id,
-            action: "available"
+            action: "available",
           },
           "Connection #%s became available",
-          connection.id
+          connection.id,
         );
         if (this._closed) {
           this.close();
@@ -9880,21 +10899,21 @@ function requireSmtpPool() {
             {
               err,
               tnx: "pool",
-              cid: connection.id
+              cid: connection.id,
             },
             "Pool Error for #%s: %s",
             connection.id,
-            err.message
+            err.message,
           );
         } else {
           this.logger.debug(
             {
               tnx: "pool",
               cid: connection.id,
-              action: "maxlimit"
+              action: "maxlimit",
             },
             "Max messages limit exchausted for #%s",
-            connection.id
+            connection.id,
           );
         }
         if (connection.queueEntry) {
@@ -9905,11 +10924,11 @@ function requireSmtpPool() {
               {
                 err: E,
                 tnx: "callback",
-                cid: connection.id
+                cid: connection.id,
               },
               "Callback error for #%s: %s",
               connection.id,
-              E.message
+              E.message,
             );
           }
           connection.queueEntry = false;
@@ -9922,10 +10941,10 @@ function requireSmtpPool() {
           {
             tnx: "connection",
             cid: connection.id,
-            action: "closed"
+            action: "closed",
           },
           "Connection #%s was closed",
-          connection.id
+          connection.id,
         );
         this._removeConnection(connection);
         if (connection.queueEntry) {
@@ -9958,18 +10977,20 @@ function requireSmtpPool() {
     _failDeliveryOnConnectionClose(connection) {
       if (connection.queueEntry && connection.queueEntry.callback) {
         try {
-          connection.queueEntry.callback(new Error("Reached maximum number of retries after connection was closed"));
+          connection.queueEntry.callback(
+            new Error("Reached maximum number of retries after connection was closed"),
+          );
         } catch (E) {
           this.logger.error(
             {
               err: E,
               tnx: "callback",
               messageId: connection.queueEntry.messageId,
-              cid: connection.id
+              cid: connection.id,
             },
             "Callback error for #%s: %s",
             connection.id,
-            E.message
+            E.message,
           );
         }
         connection.queueEntry = false;
@@ -9982,12 +11003,12 @@ function requireSmtpPool() {
           tnx: "pool",
           cid: connection.id,
           messageId: connection.queueEntry.messageId,
-          action: "requeue"
+          action: "requeue",
         },
         "Re-queued message <%s> for #%s. Attempt: #%s",
         connection.queueEntry.messageId,
         connection.id,
-        connection.queueEntry.requeueAttempts
+        connection.queueEntry.requeueAttempts,
       );
       this._queue.unshift(connection.queueEntry);
       connection.queueEntry = false;
@@ -10031,7 +11052,10 @@ function requireSmtpPool() {
         return this._clearRateLimit();
       }
       if (!this._rateLimit.timeout) {
-        this._rateLimit.timeout = setTimeout(() => this._clearRateLimit(), this._rateLimit.delta - (now - this._rateLimit.checkpoint));
+        this._rateLimit.timeout = setTimeout(
+          () => this._clearRateLimit(),
+          this._rateLimit.delta - (now - this._rateLimit.checkpoint),
+        );
         this._rateLimit.checkpoint = now;
       }
     }
@@ -10080,13 +11104,13 @@ function requireSmtpPool() {
               remotePort: socketOptions.connection.remotePort,
               destHost: options.host || "",
               destPort: options.port || "",
-              action: "connected"
+              action: "connected",
             },
             "Using proxied socket from %s:%s to %s:%s",
             socketOptions.connection.remoteAddress,
             socketOptions.connection.remotePort,
             options.host || "",
-            options.port || ""
+            options.port || "",
           );
           options = Object.assign(shared2.assign(false, options), socketOptions);
         }
@@ -10166,7 +11190,7 @@ function requireSmtpTransport() {
       options = options || {};
       if (typeof options === "string") {
         options = {
-          url: options
+          url: options,
         };
       }
       let urlData;
@@ -10185,11 +11209,11 @@ function requireSmtpTransport() {
         // regular options
         urlData,
         // url options
-        service && wellKnown2(service)
+        service && wellKnown2(service),
         // wellknown options
       );
       this.logger = shared2.getLogger(this.options, {
-        component: this.options.component || "smtp-transport"
+        component: this.options.component || "smtp-transport",
       });
       this.name = "SMTP";
       this.version = packageData.version + "[client:" + packageData.version + "]";
@@ -10210,14 +11234,15 @@ function requireSmtpTransport() {
     getAuth(authOpts) {
       if (!authOpts) {
         if (this.auth && this.auth.oauth2 && this.mailer) {
-          this.auth.oauth2.provisionCallback = this.mailer.get("oauth2_provision_cb") || this.auth.oauth2.provisionCallback;
+          this.auth.oauth2.provisionCallback =
+            this.mailer.get("oauth2_provision_cb") || this.auth.oauth2.provisionCallback;
         }
         return this.auth;
       }
       const authData = Object.assign(
         {},
         this.options.auth && typeof this.options.auth === "object" ? this.options.auth : {},
-        typeof authOpts === "object" ? authOpts : {}
+        typeof authOpts === "object" ? authOpts : {},
       );
       if (Object.keys(authData).length === 0) {
         return false;
@@ -10228,14 +11253,15 @@ function requireSmtpTransport() {
             return false;
           }
           const oauth2 = new XOAuth2(authData, this.logger);
-          oauth2.provisionCallback = this.mailer && this.mailer.get("oauth2_provision_cb") || oauth2.provisionCallback;
+          oauth2.provisionCallback =
+            (this.mailer && this.mailer.get("oauth2_provision_cb")) || oauth2.provisionCallback;
           oauth2.on("token", (token) => this.mailer.emit("token", token));
           oauth2.on("error", (err) => this.emit("error", err));
           return {
             type: "OAUTH2",
             user: authData.user,
             oauth2,
-            method: "XOAUTH2"
+            method: "XOAUTH2",
           };
         }
         default:
@@ -10245,9 +11271,10 @@ function requireSmtpTransport() {
             credentials: {
               user: authData.user || "",
               pass: authData.pass,
-              options: authData.options
+              options: authData.options,
             },
-            method: (authData.method || "").trim().toUpperCase() || this.options.authMethod || false
+            method:
+              (authData.method || "").trim().toUpperCase() || this.options.authMethod || false,
           };
       }
     }
@@ -10272,13 +11299,13 @@ function requireSmtpTransport() {
               remotePort: socketOptions.connection.remotePort,
               destHost: options.host || "",
               destPort: options.port || "",
-              action: "connected"
+              action: "connected",
             },
             "Using proxied socket from %s:%s to %s:%s",
             socketOptions.connection.remoteAddress,
             socketOptions.connection.remotePort,
             options.host || "",
-            options.port || ""
+            options.port || "",
           );
           options = Object.assign(shared2.assign(false, options), socketOptions);
         }
@@ -10317,8 +11344,7 @@ function requireSmtpTransport() {
           }, 1e3);
           try {
             timer.unref();
-          } catch (_E) {
-          }
+          } catch (_E) {}
         });
         const sendMessage = () => {
           const envelope = mail.message.getEnvelope();
@@ -10336,11 +11362,11 @@ function requireSmtpTransport() {
           this.logger.info(
             {
               tnx: "send",
-              messageId
+              messageId,
             },
             "Sending message %s to <%s>",
             messageId,
-            recipients.join(", ")
+            recipients.join(", "),
           );
           connection.send(envelope, mail.message.createReadStream(), (err2, info) => {
             returned = true;
@@ -10350,17 +11376,17 @@ function requireSmtpTransport() {
               this.logger.error(
                 {
                   err: err2,
-                  tnx: "send"
+                  tnx: "send",
                 },
                 "Send error for %s: %s",
                 messageId,
-                err2.message
+                err2.message,
               );
               return callback(err2);
             }
             info.envelope = {
               from: envelope.from,
-              to: envelope.to
+              to: envelope.to,
             };
             info.messageId = messageId;
             try {
@@ -10369,11 +11395,11 @@ function requireSmtpTransport() {
               this.logger.error(
                 {
                   err: E,
-                  tnx: "callback"
+                  tnx: "callback",
                 },
                 "Callback error for %s: %s",
                 messageId,
-                E.message
+                E.message,
               );
             }
           });
@@ -10427,13 +11453,13 @@ function requireSmtpTransport() {
               remotePort: socketOptions.connection.remotePort,
               destHost: options.host || "",
               destPort: options.port || "",
-              action: "connected"
+              action: "connected",
             },
             "Using proxied socket from %s:%s to %s:%s",
             socketOptions.connection.remoteAddress,
             socketOptions.connection.remotePort,
             options.host || "",
-            options.port || ""
+            options.port || "",
           );
           options = Object.assign(shared2.assign(false, options), socketOptions);
         }
@@ -10538,7 +11564,7 @@ function requireSendmailTransport() {
       this.path = "sendmail";
       this.args = false;
       this.logger = shared2.getLogger(this.options, {
-        component: this.options.component || "sendmail"
+        component: this.options.component || "sendmail",
       });
       if (typeof options === "string") {
         this.path = options;
@@ -10550,7 +11576,9 @@ function requireSendmailTransport() {
           this.args = options.args;
         }
       }
-      this.winbreak = ["win", "windows", "dos", "\r\n"].includes((options.newline || "").toString().toLowerCase());
+      this.winbreak = ["win", "windows", "dos", "\r\n"].includes(
+        (options.newline || "").toString().toLowerCase(),
+      );
     }
     /**
      * <p>Compiles a mailcomposer message and forwards it to handler that sends it.</p>
@@ -10563,13 +11591,18 @@ function requireSendmailTransport() {
       const envelope = mail.data.envelope || mail.message.getEnvelope();
       const messageId = mail.message.messageId();
       let returned;
-      const hasInvalidAddresses = [].concat(envelope.from || []).concat(envelope.to || []).some((addr) => /^-/.test(addr));
+      const hasInvalidAddresses = []
+        .concat(envelope.from || [])
+        .concat(envelope.to || [])
+        .some((addr) => /^-/.test(addr));
       if (hasInvalidAddresses) {
         const err = new Error("Can not send mail. Invalid envelope addresses.");
         err.code = errors2.ESENDMAIL;
         return done(err);
       }
-      const args = this.args ? ["-i"].concat(this.args).concat(envelope.to) : ["-i"].concat(envelope.from ? ["-f", envelope.from] : []).concat(envelope.to);
+      const args = this.args
+        ? ["-i"].concat(this.args).concat(envelope.to)
+        : ["-i"].concat(envelope.from ? ["-f", envelope.from] : []).concat(envelope.to);
       const callback = (err) => {
         if (returned) {
           return;
@@ -10582,7 +11615,7 @@ function requireSendmailTransport() {
           return done(null, {
             envelope,
             messageId,
-            response: "Messages queued for delivery"
+            response: "Messages queued for delivery",
           });
         }
       };
@@ -10594,10 +11627,10 @@ function requireSendmailTransport() {
           {
             err: E,
             tnx: "spawn",
-            messageId
+            messageId,
           },
           "Error occurred while spawning sendmail. %s",
-          E.message
+          E.message,
         );
         return callback(E);
       }
@@ -10607,11 +11640,11 @@ function requireSendmailTransport() {
             {
               err,
               tnx: "spawn",
-              messageId
+              messageId,
             },
             "Error occurred when sending message %s. %s",
             messageId,
-            err.message
+            err.message,
           );
           callback(err);
         });
@@ -10620,18 +11653,20 @@ function requireSendmailTransport() {
             return callback();
           }
           const err = new Error(
-            code === 127 ? "Sendmail command not found, process exited with code " + code : "Sendmail exited with code " + code
+            code === 127
+              ? "Sendmail command not found, process exited with code " + code
+              : "Sendmail exited with code " + code,
           );
           err.code = errors2.ESENDMAIL;
           this.logger.error(
             {
               err,
               tnx: "stdin",
-              messageId
+              messageId,
             },
             "Error sending message %s to sendmail. %s",
             messageId,
-            err.message
+            err.message,
           );
           callback(err);
         });
@@ -10641,11 +11676,11 @@ function requireSendmailTransport() {
             {
               err,
               tnx: "stdin",
-              messageId
+              messageId,
             },
             "Error occurred when piping message %s to sendmail. %s",
             messageId,
-            err.message
+            err.message,
           );
           callback(err);
         });
@@ -10656,11 +11691,11 @@ function requireSendmailTransport() {
         this.logger.info(
           {
             tnx: "send",
-            messageId
+            messageId,
           },
           "Sending message %s to <%s>",
           messageId,
-          recipients.join(", ")
+          recipients.join(", "),
         );
         const sourceStream = mail.message.createReadStream();
         let stream = sourceStream;
@@ -10673,11 +11708,11 @@ function requireSendmailTransport() {
             {
               err,
               tnx: "stdin",
-              messageId
+              messageId,
             },
             "Error occurred when generating message %s. %s",
             messageId,
-            err.message
+            err.message,
           );
           sendmail.kill("SIGINT");
           callback(err);
@@ -10709,9 +11744,11 @@ function requireStreamTransport() {
       this.name = "StreamTransport";
       this.version = packageData.version;
       this.logger = shared2.getLogger(this.options, {
-        component: this.options.component || "stream-transport"
+        component: this.options.component || "stream-transport",
       });
-      this.winbreak = ["win", "windows", "dos", "\r\n"].includes((options.newline || "").toString().toLowerCase());
+      this.winbreak = ["win", "windows", "dos", "\r\n"].includes(
+        (options.newline || "").toString().toLowerCase(),
+      );
     }
     /**
      * Compiles a mailcomposer message and forwards it to handler that sends it
@@ -10730,12 +11767,12 @@ function requireStreamTransport() {
       this.logger.info(
         {
           tnx: "send",
-          messageId
+          messageId,
         },
         "Sending message %s to <%s> using %s line breaks",
         messageId,
         recipients.join(", "),
-        this.winbreak ? "<CR><LF>" : "<LF>"
+        this.winbreak ? "<CR><LF>" : "<LF>",
       );
       setImmediate(() => {
         let stream;
@@ -10751,11 +11788,11 @@ function requireStreamTransport() {
             {
               err: E,
               tnx: "send",
-              messageId
+              messageId,
             },
             "Creating send stream failed for %s. %s",
             messageId,
-            E.message
+            E.message,
           );
           return done(E);
         }
@@ -10765,17 +11802,17 @@ function requireStreamTransport() {
               {
                 err,
                 tnx: "send",
-                messageId
+                messageId,
               },
               "Failed creating message for %s. %s",
               messageId,
-              err.message
+              err.message,
             );
           });
           return done(null, {
             envelope,
             messageId,
-            message: stream
+            message: stream,
           });
         }
         const chunks = [];
@@ -10792,21 +11829,20 @@ function requireStreamTransport() {
             {
               err,
               tnx: "send",
-              messageId
+              messageId,
             },
             "Failed creating message for %s. %s",
             messageId,
-            err.message
+            err.message,
           );
           return done(err);
         });
-        stream.on(
-          "end",
-          () => done(null, {
+        stream.on("end", () =>
+          done(null, {
             envelope,
             messageId,
-            message: Buffer.concat(chunks, chunklen)
-          })
+            message: Buffer.concat(chunks, chunklen),
+          }),
         );
       });
     }
@@ -10828,7 +11864,7 @@ function requireJsonTransport() {
       this.name = "JSONTransport";
       this.version = packageData.version;
       this.logger = shared2.getLogger(this.options, {
-        component: this.options.component || "json-transport"
+        component: this.options.component || "json-transport",
       });
     }
     /**
@@ -10848,11 +11884,11 @@ function requireJsonTransport() {
       this.logger.info(
         {
           tnx: "send",
-          messageId
+          messageId,
         },
         "Composing JSON structure of %s to <%s>",
         messageId,
-        recipients.join(", ")
+        recipients.join(", "),
       );
       setImmediate(() => {
         mail.normalize((err, data) => {
@@ -10861,11 +11897,11 @@ function requireJsonTransport() {
               {
                 err,
                 tnx: "send",
-                messageId
+                messageId,
               },
               "Failed building JSON structure for %s. %s",
               messageId,
-              err.message
+              err.message,
             );
             return done(err);
           }
@@ -10874,7 +11910,7 @@ function requireJsonTransport() {
           return done(null, {
             envelope,
             messageId,
-            message: this.options.skipEncoding ? data : JSON.stringify(data)
+            message: this.options.skipEncoding ? data : JSON.stringify(data),
           });
         });
       });
@@ -10909,12 +11945,15 @@ function requireSesTransport() {
       this.name = "SESTransport";
       this.version = packageData.version;
       this.logger = shared2.getLogger(this.options, {
-        component: this.options.component || "ses-transport"
+        component: this.options.component || "ses-transport",
       });
     }
     getRegion(cb) {
       if (this.ses.sesClient.config && typeof this.ses.sesClient.config.region === "function") {
-        return this.ses.sesClient.config.region().then((region) => cb(null, region)).catch((err) => cb(err));
+        return this.ses.sesClient.config
+          .region()
+          .then((region) => cb(null, region))
+          .catch((err) => cb(err));
       }
       return cb(null, false);
     }
@@ -10939,11 +11978,11 @@ function requireSesTransport() {
       this.logger.info(
         {
           tnx: "send",
-          messageId
+          messageId,
         },
         "Sending message %s to <%s>",
         messageId,
-        recipients.join(", ")
+        recipients.join(", "),
       );
       const getRawMessage = (next) => {
         if (!mail.data._dkim) {
@@ -10969,18 +12008,18 @@ function requireSesTransport() {
         stream.once("error", (err) => next(err));
         stream.once("end", () => next(null, Buffer.concat(chunks, chunklen)));
       };
-      setImmediate(
-        () => getRawMessage((err, raw) => {
+      setImmediate(() =>
+        getRawMessage((err, raw) => {
           if (err) {
             this.logger.error(
               {
                 err,
                 tnx: "send",
-                messageId
+                messageId,
               },
               "Failed creating message for %s. %s",
               messageId,
-              err.message
+              err.message,
             );
             return callback(err);
           }
@@ -10989,16 +12028,16 @@ function requireSesTransport() {
               Content: {
                 Raw: {
                   // required
-                  Data: raw
+                  Data: raw,
                   // required
-                }
+                },
               },
               FromEmailAddress: fromHeader || envelope.from,
               Destination: {
-                ToAddresses: envelope.to
-              }
+                ToAddresses: envelope.to,
+              },
             },
-            mail.data.ses || {}
+            mail.data.ses || {},
           );
           this.getRegion((err2, region) => {
             if (err2 || !region) {
@@ -11006,34 +12045,40 @@ function requireSesTransport() {
             }
             const command = new this.ses.SendEmailCommand(sesMessage);
             const sendPromise = this.ses.sesClient.send(command);
-            sendPromise.then((data) => {
-              if (region === "us-east-1") {
-                region = "email";
-              }
-              callback(null, {
-                envelope: {
-                  from: envelope.from,
-                  to: envelope.to
-                },
-                messageId: "<" + data.MessageId + (!/@/.test(data.MessageId) ? "@" + region + ".amazonses.com" : "") + ">",
-                response: data.MessageId,
-                raw
+            sendPromise
+              .then((data) => {
+                if (region === "us-east-1") {
+                  region = "email";
+                }
+                callback(null, {
+                  envelope: {
+                    from: envelope.from,
+                    to: envelope.to,
+                  },
+                  messageId:
+                    "<" +
+                    data.MessageId +
+                    (!/@/.test(data.MessageId) ? "@" + region + ".amazonses.com" : "") +
+                    ">",
+                  response: data.MessageId,
+                  raw,
+                });
+              })
+              .catch((err3) => {
+                tagSesError(err3);
+                this.logger.error(
+                  {
+                    err: err3,
+                    tnx: "send",
+                  },
+                  "Send error for %s: %s",
+                  messageId,
+                  err3.message,
+                );
+                callback(err3);
               });
-            }).catch((err3) => {
-              tagSesError(err3);
-              this.logger.error(
-                {
-                  err: err3,
-                  tnx: "send"
-                },
-                "Send error for %s: %s",
-                messageId,
-                err3.message
-              );
-              callback(err3);
-            });
           });
-        })
+        }),
       );
     }
     /**
@@ -11049,7 +12094,10 @@ function requireSesTransport() {
         });
       }
       const cb = (err) => {
-        if (err && !["InvalidParameterValue", "MessageRejected"].includes(err.code || err.Code || err.name)) {
+        if (
+          err &&
+          !["InvalidParameterValue", "MessageRejected"].includes(err.code || err.Code || err.name)
+        ) {
           return callback(tagSesError(err));
         }
         return callback(null, true);
@@ -11057,13 +12105,15 @@ function requireSesTransport() {
       const sesMessage = {
         Content: {
           Raw: {
-            Data: Buffer.from("From: <invalid@invalid>\r\nTo: <invalid@invalid>\r\n Subject: Invalid\r\n\r\nInvalid")
-          }
+            Data: Buffer.from(
+              "From: <invalid@invalid>\r\nTo: <invalid@invalid>\r\n Subject: Invalid\r\n\r\nInvalid",
+            ),
+          },
         },
         FromEmailAddress: "invalid@invalid",
         Destination: {
-          ToAddresses: ["invalid@invalid"]
-        }
+          ToAddresses: ["invalid@invalid"],
+        },
       };
       this.getRegion(() => {
         const command = new this.ses.SendEmailCommand(sesMessage);
@@ -11091,17 +12141,22 @@ function requireNodemailer() {
   const errors2 = requireErrors();
   const nmfetch = requireFetch();
   const packageData = require$$10;
-  const ETHEREAL_API = (process.env.ETHEREAL_API || "https://api.nodemailer.com").replace(/\/+$/, "");
+  const ETHEREAL_API = (process.env.ETHEREAL_API || "https://api.nodemailer.com").replace(
+    /\/+$/,
+    "",
+  );
   const ETHEREAL_WEB = (process.env.ETHEREAL_WEB || "https://ethereal.email").replace(/\/+$/, "");
   const ETHEREAL_API_KEY = (process.env.ETHEREAL_API_KEY || "").replace(/\s*/g, "") || null;
-  const ETHEREAL_CACHE = ["true", "yes", "y", "1"].includes((process.env.ETHEREAL_CACHE || "yes").toString().trim().toLowerCase());
+  const ETHEREAL_CACHE = ["true", "yes", "y", "1"].includes(
+    (process.env.ETHEREAL_CACHE || "yes").toString().trim().toLowerCase(),
+  );
   let testAccount = false;
-  nodemailer$1.createTransport = function(transporter, defaults) {
+  nodemailer$1.createTransport = function (transporter, defaults) {
     let options;
     if (
       // provided transporter is a configuration object, not transporter plugin
-      typeof transporter === "object" && typeof transporter.send !== "function" || // provided transporter looks like a connection url
-      typeof transporter === "string" && /^(smtps?|direct):/i.test(transporter)
+      (typeof transporter === "object" && typeof transporter.send !== "function") || // provided transporter looks like a connection url
+      (typeof transporter === "string" && /^(smtps?|direct):/i.test(transporter))
     ) {
       const urlConfig = typeof transporter === "string" ? transporter : transporter.url;
       if (urlConfig) {
@@ -11120,7 +12175,7 @@ function requireNodemailer() {
       } else if (options.SES) {
         if (options.SES.ses && options.SES.aws) {
           const error = new Error(
-            "Using legacy SES configuration, expecting @aws-sdk/client-sesv2, see https://nodemailer.com/transports/ses/"
+            "Using legacy SES configuration, expecting @aws-sdk/client-sesv2, see https://nodemailer.com/transports/ses/",
           );
           error.code = errors2.ECONFIG;
           throw error;
@@ -11132,7 +12187,7 @@ function requireNodemailer() {
     }
     return new Mailer(transporter, options, defaults);
   };
-  nodemailer$1.createTestAccount = function(apiUrl, callback) {
+  nodemailer$1.createTestAccount = function (apiUrl, callback) {
     let promise;
     if (!callback && typeof apiUrl === "function") {
       callback = apiUrl;
@@ -11153,7 +12208,7 @@ function requireNodemailer() {
     const requestHeaders = {};
     const requestBody = {
       requestor: packageData.name,
-      version: packageData.version
+      version: packageData.version,
     };
     if (ETHEREAL_API_KEY) {
       requestHeaders.Authorization = "Bearer " + ETHEREAL_API_KEY;
@@ -11162,7 +12217,7 @@ function requireNodemailer() {
       contentType: "application/json",
       method: "POST",
       headers: requestHeaders,
-      body: Buffer.from(JSON.stringify(requestBody))
+      body: Buffer.from(JSON.stringify(requestBody)),
     };
     if (/^https:/i.test(apiUrl)) {
       fetchOptions.tls = { rejectUnauthorized: true };
@@ -11193,7 +12248,7 @@ function requireNodemailer() {
     });
     return promise;
   };
-  nodemailer$1.getTestMessageUrl = function(info) {
+  nodemailer$1.getTestMessageUrl = function (info) {
     if (!info || !info.response) {
       return false;
     }
@@ -11217,6 +12272,4 @@ function requireNodemailer() {
 }
 var nodemailerExports = requireNodemailer();
 const nodemailer = /* @__PURE__ */ getDefaultExportFromCjs(nodemailerExports);
-export {
-  nodemailer as n
-};
+export { nodemailer as n };
